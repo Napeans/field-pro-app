@@ -1,4 +1,4 @@
-package com.filedpromasterapp
+package com.cstapp
 
 import android.app.Application
 import com.facebook.react.PackageList

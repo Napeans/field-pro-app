@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "filedProMasterApp.app"
-               BlueprintName = "filedProMasterApp"
-               ReferencedContainer = "container:filedProMasterApp.xcodeproj">
+               BuildableName = "cstapp.app"
+               BlueprintName = "cstapp"
+               ReferencedContainer = "container:cstapp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "filedProMasterAppTests.xctest"
-               BlueprintName = "filedProMasterAppTests"
-               ReferencedContainer = "container:filedProMasterApp.xcodeproj">
+               BuildableName = "cstappTests.xctest"
+               BlueprintName = "cstappTests"
+               ReferencedContainer = "container:cstapp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "filedProMasterApp.app"
-            BlueprintName = "filedProMasterApp"
-            ReferencedContainer = "container:filedProMasterApp.xcodeproj">
+            BuildableName = "cstapp.app"
+            BlueprintName = "cstapp"
+            ReferencedContainer = "container:cstapp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "filedProMasterApp.app"
-            BlueprintName = "filedProMasterApp"
-            ReferencedContainer = "container:filedProMasterApp.xcodeproj">
+            BuildableName = "cstapp.app"
+            BlueprintName = "cstapp"
+            ReferencedContainer = "container:cstapp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
