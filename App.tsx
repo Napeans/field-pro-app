@@ -1,38 +1,25 @@
 import React from 'react';
-import { SafeAreaView, View, Text, StyleSheet, StatusBar, Platform } from 'react-native';
+import { StatusBar, Platform } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import RootNavigator from './src/navigation/RootNavigator';
+import { enableScreens } from 'react-native-screens';
 
-const BACKGROUND_COLOR = '#F0F4F2';
+// Enable react-native-screens for better performance and proper native view handling
+enableScreens();
 
-const App = () => {
+const App: React.FC = () => {
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <>
       <StatusBar
         barStyle="dark-content"
-        backgroundColor={BACKGROUND_COLOR}
+        backgroundColor="#F0F4F2"
         translucent={Platform.OS === 'android'}
       />
-      <View style={styles.container}>
-        <Text style={styles.text}>Hello, welcome to FieldPro App!</Text>
-      </View>
-    </SafeAreaView>
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    </>
   );
 };
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: BACKGROUND_COLOR,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-});
 
 export default App;
