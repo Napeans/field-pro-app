@@ -73,7 +73,7 @@ const ProfileScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+      <View style={[styles.container,{backgroundColor:'white'}]}>
       <Text style={styles.text}>🏠 PROFILE</Text>
 
       <View style={{ marginTop: 20 }}>

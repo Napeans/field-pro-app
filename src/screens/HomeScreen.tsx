@@ -78,7 +78,7 @@ const HomeScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+      <View style={[styles.container,{backgroundColor:'white'}]}>
       <Button title="Get Location" onPress={handleLocationPress} />
 
       <Text style={styles.text}>🏠 Home</Text>
