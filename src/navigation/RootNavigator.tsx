@@ -6,7 +6,7 @@ const RootNavigator: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   return isLoggedIn ? (
-    <BottomTabs />
+    <BottomTabs onLogOut={() => setIsLoggedIn(false)} />
   ) : (
     <AuthStack onLogin={() => setIsLoggedIn(true)} />
   );

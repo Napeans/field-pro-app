@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-
 import HomeIcon from '../icon/HomeIcon';
 import CandyGridIcon from '../icon/CandyBoxIcon';
-
 import MoreBottomMenu from '../navigation/MoreBottomMenu';
+import { navigationProps } from './../types/navigation';
 
 const Tab = createBottomTabNavigator();
 
-const BottomTabs = () => {
+const BottomTabs : React.FC<navigationProps> = ({ onLogOut }) => {
   const [visible, setVisible] = useState(false);
   const handleClose = (action: string) => {
     setVisible(false)
@@ -19,16 +17,13 @@ const BottomTabs = () => {
       case 'Help Desk':
         console.log('Navigate to Help Desk');
         break;
-      case 'Policies':
-        console.log('Open Policies');
+      case 'Profile':
+        console.log('Open Profile');
         break;
-
       case 'LogOut':
-        console.log('Open Policies');
+        onLogOut?.();
         break;
-
       default:
-        // just close modal (overlay / back button)
         break;
     }
   };
@@ -52,6 +47,7 @@ const BottomTabs = () => {
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
 
         <Tab.Screen
           name="More"
