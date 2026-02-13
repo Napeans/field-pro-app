@@ -8,10 +8,10 @@ import {
     Pressable,
     SafeAreaView,
 } from 'react-native';
-
+import { BellAlertIcon,ArrowLeftOnRectangleIcon,DocumentIcon } from "react-native-heroicons/solid";
 interface MoreBottomMenuProps {
     visible: boolean;
-    onClose: () => void;
+    onClose: (value: string) => void;
     options?: string[]; // optional dynamic options
 }
 
@@ -24,10 +24,10 @@ const MoreBottomMenu: React.FC<MoreBottomMenuProps> = ({
             visible={visible}
             transparent
             animationType="slide"
-            onRequestClose={onClose}
+             onRequestClose={() => onClose('')}
         >
             {/* Background overlay */}
-            <Pressable style={styles.overlay} onPress={onClose} />
+            <Pressable style={styles.overlay} onPress={() => onClose('')} />
 
             {/* Bottom Sheet */}
             <View style={styles.sheet}>
@@ -47,18 +47,30 @@ const MoreBottomMenu: React.FC<MoreBottomMenuProps> = ({
                     </View>
                     <View>
                         <View style={styles.menuItem}>
-                            <TouchableOpacity onPress={onClose}>
+                            <TouchableOpacity
+                                onPress={() => onClose('Help Desk')}
+                                style={styles.menuItemButton}
+                            >
+                                <BellAlertIcon size={28}  color="#4CAF50" />
                                 <Text style={styles.menuText}>Help Desk</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.menuItem}>
-                            <TouchableOpacity onPress={onClose}>
+                              <TouchableOpacity
+                                onPress={() => onClose('Policies')}
+                                style={styles.menuItemButton}
+                            >
+                                <DocumentIcon size={28}  color="#4CAF50" />
                                 <Text style={styles.menuText}>Policies</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.menuItem}>
-                            <TouchableOpacity onPress={onClose}>
-                                <Text style={styles.menuText}>Logout</Text>
+                              <TouchableOpacity
+                                onPress={() => onClose('LogOut')}
+                                style={styles.menuItemButton}
+                            >
+                                <ArrowLeftOnRectangleIcon size={28}  color="#4CAF50" />
+                                <Text style={styles.menuText}>LogOut</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -72,6 +84,15 @@ const MoreBottomMenu: React.FC<MoreBottomMenuProps> = ({
 export default MoreBottomMenu;
 
 const styles = StyleSheet.create({
+    menuItemButton: {
+    flexDirection: 'row',   // 🔥 icon and text side-by-side
+    alignItems: 'center',  
+  },
+  menuText: {
+    marginLeft: 10,         // space between icon & text
+    fontSize: 16,
+    color: '#333',
+  },
     menuItem: {
         padding: 20,
         borderBottomWidth: 0.5,
@@ -83,11 +104,7 @@ const styles = StyleSheet.create({
         shadowRadius: 1,
         elevation: 1,
     },
-    menuText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: 'gray'
-    },
+  
     overlay: {
         position: 'absolute',  // ensures it covers everything
         top: 0,

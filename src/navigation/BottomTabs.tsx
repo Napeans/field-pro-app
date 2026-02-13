@@ -13,7 +13,25 @@ const Tab = createBottomTabNavigator();
 
 const BottomTabs = () => {
   const [visible, setVisible] = useState(false);
+  const handleClose = (action: string) => {
+    setVisible(false)
+    switch (action) {
+      case 'Help Desk':
+        console.log('Navigate to Help Desk');
+        break;
+      case 'Policies':
+        console.log('Open Policies');
+        break;
 
+      case 'LogOut':
+        console.log('Open Policies');
+        break;
+
+      default:
+        // just close modal (overlay / back button)
+        break;
+    }
+  };
   return (
     <>
       <Tab.Navigator
@@ -49,7 +67,7 @@ const BottomTabs = () => {
 
       <MoreBottomMenu
         visible={visible}
-        onClose={() => setVisible(false)}
+        onClose={handleClose}
       />
     </>
   );
