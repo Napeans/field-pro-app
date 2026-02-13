@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
 export const Colors = {
-  buttonbackground: '#04A554',
   buttonTextColor: '#fff',
   BACKGROUND_COLOR : '#F0F4F2',
   PRIMARY_BLUE: '#04A554',
-  ERROR_RED:'#FF3B30'
+  ERROR_RED:'#FF3B30',
+  BUTTON_DISABLECOLOR:'#DBFDCA'
 };
 
 export const GlobalFontSize = {
@@ -42,7 +42,7 @@ const GlobalStyles = StyleSheet.create({
   },
     input: {
     height: 50,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: Colors.PRIMARY_BLUE,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -61,6 +61,13 @@ const GlobalStyles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
+  },
+   disabledButton: {
+    backgroundColor: Colors.BUTTON_DISABLECOLOR,
+  },
+
+  disabledButtonText: {
+    color: Colors.PRIMARY_BLUE,
   },
 });
 
