@@ -24,8 +24,7 @@ const MoreBottomMenu: React.FC<MoreBottomMenuProps> = ({
             visible={visible}
             transparent
             animationType="slide"
-             onRequestClose={() => onClose('')}
-        >
+            onRequestClose={() => onClose('')}>
             {/* Background overlay */}
             <Pressable style={styles.overlay} onPress={() => onClose('')} />
 
@@ -41,7 +40,8 @@ const MoreBottomMenu: React.FC<MoreBottomMenuProps> = ({
 
                         </Text>
 
-                        <Text style={styles.right}><TouchableOpacity style={styles.button}>
+                        <Text style={styles.right}>
+                            <TouchableOpacity style={styles.button} onPress={() => onClose('')}>
                             <Text style={styles.text}>✕</Text>
                         </TouchableOpacity></Text>
                     </View>
