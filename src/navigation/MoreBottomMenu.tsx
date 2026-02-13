@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     },
     sheet: {
         position: 'absolute',  // position it at the bottom
-        bottom: 0,
+        bottom: -30,
         left: 0,
         right: 0,
         backgroundColor: 'white',

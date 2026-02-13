@@ -3,7 +3,7 @@ import AuthStack from './AuthStack';
 import BottomTabs from './BottomTabs';
 
 const RootNavigator: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return isLoggedIn ? (
     <BottomTabs onLogOut={() => setIsLoggedIn(false)} />

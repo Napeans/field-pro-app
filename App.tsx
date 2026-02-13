@@ -4,7 +4,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import RootNavigator from './src/navigation/RootNavigator';
 import { enableScreens } from 'react-native-screens';
 
-// Enable react-native-screens for better performance and proper native view handling
 enableScreens();
 
 const App: React.FC = () => {
