@@ -17,8 +17,7 @@ interface MoreBottomMenuProps {
 
 const MoreBottomMenu: React.FC<MoreBottomMenuProps> = ({
   visible,
-  onClose,
-  options = ['Option 1', 'Option 2'],
+  onClose
 }) => {
   return (
     <Modal 
@@ -37,14 +36,33 @@ const MoreBottomMenu: React.FC<MoreBottomMenuProps> = ({
           <View style={styles.dragIndicator} />
 
           {/* Sheet title */}
-          <Text style={styles.title}>More Menu</Text>
-
-          {/* Menu options */}
-          {options.map((item, index) => (
-            <TouchableOpacity key={index} onPress={onClose}>
-              <Text style={styles.item}>{item}</Text>
+         <View style={styles.row}>
+      <Text style={styles.left}>
+         
+      </Text>
+      
+      <Text style={styles.right}><TouchableOpacity style={styles.button}>
+      <Text style={styles.text}>✕</Text>
+    </TouchableOpacity></Text>
+    </View>
+<View>
+    <View style={styles.menuItem}>
+          <TouchableOpacity onPress={onClose}>
+            <Text style={styles.menuText}>Help Desk</Text>
             </TouchableOpacity>
-          ))}
+    </View>
+    <View style={styles.menuItem}>
+            <TouchableOpacity onPress={onClose}>
+            <Text style={styles.menuText}>Policies</Text>
+            </TouchableOpacity>
+            </View>
+                <View style={styles.menuItem}>
+            <TouchableOpacity onPress={onClose}>
+            <Text style={styles.menuText}>Logout</Text>
+            </TouchableOpacity>
+            </View>
+      </View> 
+      
         </SafeAreaView>
       </View>
     </Modal>
@@ -54,6 +72,22 @@ const MoreBottomMenu: React.FC<MoreBottomMenuProps> = ({
 export default MoreBottomMenu;
 
 const styles = StyleSheet.create({
+menuItem: {
+  padding: 20,
+  borderBottomWidth: 0.5,
+  borderColor: 'silver',
+  backgroundColor: 'white', 
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.1,
+  shadowRadius: 1,
+  elevation: 1,
+},
+    menuText:{
+        fontSize:20,
+        fontWeight:'bold',
+        color:'gray'
+    },
   overlay: {
     position: 'absolute',  // ensures it covers everything
     top: 0,
@@ -68,7 +102,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'white',
-    padding: 20,
+    padding: 10,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '50%',
@@ -93,6 +127,37 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     textAlign: 'center',
     color: 'black',
+  },
+    row: {
+    flexDirection: 'row', // horizontal layout
+    alignItems: 'center', // vertical alignment center
+    justifyContent: 'space-between', // push left and right to edges
+    paddingHorizontal: 16,
+    height: 50,
+  },
+  left: {
+    fontSize: 16,
+    color: '#333',
+  },
+  right: {
+    fontSize: 16,
+    color: '#555',
+  },
+    button: {
+    position: 'absolute', // usually top-right
+    top: 10,
+    right: 10,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eee', // optional background
+    borderRadius: 15, // make it round
+  },
+  text: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
   },
 });
 
