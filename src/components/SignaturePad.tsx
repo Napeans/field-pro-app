@@ -19,15 +19,18 @@ type SignaturePadProps = {
 const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCancel }) => {
   const signatureCanvasRef = useRef<any>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [hasSignature, setHasSignature] = useState(false);
 
   const handleOK = async () => {
     try {
       const signature = await signatureCanvasRef.current?.readSignature();
-      if (!signature || signature.trim() === '') {
+      // If user has drawn something (hasSignature is true), proceed with capture
+      // even if readSignature returns unexpected format
+      if (hasSignature) {
+        onSignatureCapture(signature || '');
+      } else {
         Alert.alert('Error', 'Please draw a signature');
-        return;
       }
-      onSignatureCapture(signature);
     } catch (error) {
       Alert.alert('Error', 'Failed to capture signature');
     }
@@ -36,6 +39,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
   const handleClear = () => {
     signatureCanvasRef.current?.clearSignature();
     setIsDrawing(false);
+    setHasSignature(false);
   };
 
   return (
@@ -47,7 +51,10 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
 
       <SignatureCanvas
         ref={signatureCanvasRef}
-        onBegin={() => setIsDrawing(true)}
+        onBegin={() => {
+          setIsDrawing(true);
+          setHasSignature(true);
+        }}
         onEnd={() => setIsDrawing(false)}
         penColor={Colors.PRIMARY_BLUE}
         style={styles.canvas}
@@ -67,9 +74,9 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.button, styles.okButton, !isDrawing && styles.okButtonDisabled]}
+          style={[styles.button, styles.okButton, !hasSignature && styles.okButtonDisabled]}
           onPress={handleOK}
-          disabled={!isDrawing}
+          disabled={!hasSignature}
         >
           <Text style={styles.okButtonText}>OK</Text>
         </TouchableOpacity>
