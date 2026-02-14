@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Button,
   TouchableOpacity,
+  Switch,
   PermissionsAndroid,
   Platform,
   Alert,
@@ -19,12 +20,38 @@ const HomeScreen: React.FC = () => {
     title: string;
     address: string;
     time: string;
+    date: Date;
     checkedIn: boolean;
-  }>>([
-    { id: 'J-1001', title: 'Replace AC Filter', address: '123 Main St, Springfield', time: '08:00 AM', checkedIn: false },
-    { id: 'J-1002', title: 'Inspect Generator', address: '45 Industrial Rd, Shelbyville', time: '10:30 AM', checkedIn: false },
-    { id: 'J-1003', title: 'Fix Leak', address: '88 River Ave, Ogden', time: '01:00 PM', checkedIn: false },
-  ]);
+  }>>(() => {
+    const today = new Date();
+    const yesterday = new Date(); yesterday.setDate(today.getDate() - 2);
+    const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
+    const lastWeek = new Date(); lastWeek.setDate(today.getDate() - 8);
+
+    return [
+      { id: 'J-1001', title: 'Replace AC Filter', address: '123 Main St, Springfield', time: '08:00 AM', date: today, checkedIn: false },
+      { id: 'J-1002', title: 'Inspect Generator', address: '45 Industrial Rd, Shelbyville', time: '10:30 AM', date: yesterday, checkedIn: false },
+      { id: 'J-1003', title: 'Fix Leak', address: '88 River Ave, Ogden', time: '01:00 PM', date: tomorrow, checkedIn: false },
+      { id: 'J-1004', title: 'Roof Inspection', address: '200 Hill St, Springfield', time: '03:00 PM', date: lastWeek, checkedIn: false },
+    ];
+  });
+
+  const [filter, setFilter] = useState<'today' | 'week' | 'all'>('today');
+  const [showPast, setShowPast] = useState<boolean>(false);
+
+  const filteredJobs = (() => {
+    const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
+    const endOfToday = new Date(startOfToday); endOfToday.setHours(23,59,59,999);
+    const endOfWeek = new Date(startOfToday); endOfWeek.setDate(endOfWeek.getDate() + 7);
+
+    return allocatedJobs.filter(job => {
+      const jd = job.date instanceof Date ? job.date : new Date(job.date);
+      if (!showPast && jd < startOfToday) return false;
+      if (filter === 'today') return jd >= startOfToday && jd <= endOfToday;
+      if (filter === 'week') return jd >= startOfToday && jd <= endOfWeek;
+      return true;
+    });
+  })();
 
   const handleCheckIn = () => {
     setCheckedIn(prev => !prev);
@@ -86,18 +113,41 @@ const HomeScreen: React.FC = () => {
   </View>
       
   <View style={{ padding: 16 }}>
+    <View style={styles.filterBar}>
+      <View style={styles.filterChips}>
+        <TouchableOpacity style={[styles.chip, filter === 'today' && styles.chipActive]} onPress={() => setFilter('today')}>
+          <Text style={[styles.chipText, filter === 'today' && styles.chipTextActive]}>Today</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.chip, filter === 'week' && styles.chipActive]} onPress={() => setFilter('week')}>
+          <Text style={[styles.chipText, filter === 'week' && styles.chipTextActive]}>This Week</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.chip, filter === 'all' && styles.chipActive]} onPress={() => setFilter('all')}>
+          <Text style={[styles.chipText, filter === 'all' && styles.chipTextActive]}>All</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Text style={{ marginRight: 8, color: '#444' }}>Show past</Text>
+        <Switch value={showPast} onValueChange={setShowPast} />
+      </View>
+    </View>
 
+    <View style={{ marginTop: 8, marginBottom: 6 }}>
+      <Text style={{ fontSize: 14, color: '#444' }}>Showing {filteredJobs.length} of {allocatedJobs.length} jobs</Text>
+    </View>
 
 
     <View style={{ marginTop: 12 }}>
       <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 8 }}>Allocated Jobs</Text>
-      {allocatedJobs.map(job => (
+      {filteredJobs.map(job => (
         <View key={job.id} style={styles.jobItem}>
           <View style={{ flex: 1 }}>
             <Text style={styles.jobId}>{job.id}</Text>
             <Text style={styles.jobTitle}>{job.title}</Text>
             <Text style={styles.jobAddress}>{job.address}</Text>
-            <Text style={styles.jobTime}>{job.time}</Text>
+            <View style={{ flexDirection: 'row', marginTop: 6, alignItems: 'center' }}>
+              <Text style={styles.jobTime}>{job.time}</Text>
+              <Text style={styles.jobDate}>{(job.date instanceof Date ? job.date : new Date(job.date)).toLocaleDateString()}</Text>
+            </View>
           </View>
 
           <TouchableOpacity
@@ -108,6 +158,10 @@ const HomeScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       ))}
+
+      {filteredJobs.length === 0 && (
+        <Text style={{ color: '#666', marginTop: 8 }}>No jobs match the selected filter.</Text>
+      )}
     </View>
   </View>
 
@@ -184,6 +238,42 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
     fontSize: 13,
+  },
+  jobDate: {
+    color: '#666',
+    marginLeft: 10,
+    fontSize: 13,
+  },
+  filterBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  filterChips: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chip: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    marginRight: 8,
+    backgroundColor: '#fff',
+  },
+  chipActive: {
+    backgroundColor: Colors.PRIMARY_BLUE,
+    borderColor: Colors.PRIMARY_BLUE,
+  },
+  chipText: {
+    color: '#444',
+    fontSize: 13,
+  },
+  chipTextActive: {
+    color: '#fff',
+    fontWeight: '700',
   },
   jobButton: {
     backgroundColor: Colors.PRIMARY_BLUE,
