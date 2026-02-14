@@ -32,6 +32,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
   const [afterImages, setAfterImages] = useState<string[]>([]);
   const [customerSignature, setCustomerSignature] = useState<string | null>(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
+  const [liveSignaturePreview, setLiveSignaturePreview] = useState<string | null>(null);
 
   const handleSubmit = () => {
     if (!engineerComments.trim()) {
@@ -46,11 +47,13 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
     setBeforeImages([]);
     setAfterImages([]);
     setCustomerSignature(null);
+    setLiveSignaturePreview(null);
   };
 
   const handleSignatureCapture = (base64: string) => {
     setCustomerSignature(base64);
     setShowSignaturePad(false);
+    setLiveSignaturePreview(null);
   };
 
   return (
@@ -59,7 +62,11 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
       {showSignaturePad ? (
         <SignaturePad
           onSignatureCapture={handleSignatureCapture}
-          onCancel={() => setShowSignaturePad(false)}
+          onCancel={() => {
+            setShowSignaturePad(false);
+            setLiveSignaturePreview(null);
+          }}
+          onPreviewUpdate={setLiveSignaturePreview}
         />
       ) : (
         <View style={styles.modalContainer}>
@@ -115,8 +122,22 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
               >
                 <Text style={styles.signatureButtonText}>✍️ Capture Signature</Text>
               </TouchableOpacity>
+              
+              {/* Live Preview while Drawing */}
+              {liveSignaturePreview && (
+                <View style={styles.livePreview}>
+                  <Text style={styles.livePreviewLabel}>Live Preview (Drawing in progress)</Text>
+                  <Image
+                    source={{ uri: liveSignaturePreview }}
+                    style={styles.livePreviewImage}
+                  />
+                </View>
+              )}
+              
+              {/* Captured Signature */}
               {customerSignature && (
                 <View style={styles.signaturePreview}>
+                  <Text style={styles.signatureLabel}>Captured Signature</Text>
                   <Image
                     source={{ uri: customerSignature }}
                     style={styles.signatureThumbnail}
@@ -222,12 +243,46 @@ const styles = StyleSheet.create({
   },
   signaturePreview: {
     marginTop: 12,
+    padding: 12,
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: Colors.PRIMARY_BLUE,
+    borderRadius: 8,
     alignItems: 'center',
+  },
+  livePreview: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: '#f0f7ff',
+    borderWidth: 2,
+    borderColor: '#64b5f6',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  livePreviewLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1976d2',
+    marginBottom: 8,
+  },
+  livePreviewImage: {
+    width: '100%',
+    height: 100,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#90caf9',
+    backgroundColor: '#fff',
+  },
+  signatureLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.PRIMARY_BLUE,
+    marginBottom: 10,
   },
   signatureThumbnail: {
     width: '100%',
-    height: 120,
-    borderRadius: 8,
+    height: 140,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#ddd',
     backgroundColor: '#fafafa',

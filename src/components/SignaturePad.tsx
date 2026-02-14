@@ -14,12 +14,14 @@ import { Colors } from '../theme/GlobalStyles';
 type SignaturePadProps = {
   onSignatureCapture: (base64: string) => void;
   onCancel: () => void;
+  onPreviewUpdate?: (base64: string) => void;
 };
 
-const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCancel }) => {
+const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCancel, onPreviewUpdate }) => {
   const signatureCanvasRef = useRef<any>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
+  const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
 
   const handleOK = async () => {
     try {
@@ -40,6 +42,20 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
     signatureCanvasRef.current?.clearSignature();
     setIsDrawing(false);
     setHasSignature(false);
+    setSignaturePreview(null);
+  };
+
+  const capturePreview = async () => {
+    try {
+      const sig = await signatureCanvasRef.current?.readSignature();
+      setSignaturePreview(sig);
+      // update parent component in real-time
+      if (onPreviewUpdate && sig) {
+        onPreviewUpdate(sig);
+      }
+    } catch (error) {
+      // silently fail, preview is optional
+    }
   };
 
   return (
@@ -55,10 +71,21 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
           setIsDrawing(true);
           setHasSignature(true);
         }}
-        onEnd={() => setIsDrawing(false)}
+        onEnd={() => {
+          setIsDrawing(false);
+          capturePreview();
+        }}
         penColor={Colors.PRIMARY_BLUE}
         style={styles.canvas}
       />
+
+      {/* Signature Preview Box */}
+      {signaturePreview && (
+        <View style={styles.previewBox}>
+          <Text style={styles.previewLabel}>Signature Preview</Text>
+          <Image source={{ uri: signaturePreview }} style={styles.previewImage} />
+        </View>
+      )}
 
       <View style={styles.buttonRow}>
         <TouchableOpacity
@@ -107,12 +134,33 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   canvas: {
-    flex: 1,
+    flex: 0.7,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 4,
     margin: 16,
     backgroundColor: '#fafafa',
+  },
+  previewBox: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#f9f9f9',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  previewLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.PRIMARY_BLUE,
+    marginBottom: 6,
+  },
+  previewImage: {
+    width: '100%',
+    height: 80,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
   },
   buttonRow: {
     flexDirection: 'row',
