@@ -8,9 +8,11 @@ import {
   TextInput,
   Alert,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { Colors } from '../theme/GlobalStyles';
 import ImageUploader from './ImageUploader';
+import SignaturePad from './SignaturePad';
 
 type CheckInFormProps = {
   visible: boolean;
@@ -29,6 +31,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
   const [beforeImages, setBeforeImages] = useState<string[]>([]);
   const [afterImages, setAfterImages] = useState<string[]>([]);
   const [customerSignature, setCustomerSignature] = useState<string | null>(null);
+  const [showSignaturePad, setShowSignaturePad] = useState(false);
 
   const handleSubmit = () => {
     if (!engineerComments.trim()) {
@@ -45,75 +48,96 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
     setCustomerSignature(null);
   };
 
+  const handleSignatureCapture = (base64: string) => {
+    setCustomerSignature(base64);
+    setShowSignaturePad(false);
+  };
+
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalHeader}>
-          <TouchableOpacity onPress={onClose}>
-            <Text style={styles.modalCloseButton}>✕</Text>
-          </TouchableOpacity>
-          <Text style={styles.modalTitle}>Check-in Form</Text>
-          <View style={{ width: 30 }} />
-        </View>
-
-        <ScrollView style={styles.modalContent}>
-          {/* Engineer Comments */}
-          <View style={styles.formSection}>
-            <Text style={styles.formLabel}>Engineer Comments</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Enter your comments here..."
-              placeholderTextColor="#999"
-              multiline
-              numberOfLines={4}
-              value={engineerComments}
-              onChangeText={setEngineerComments}
-            />
-          </View>
-
-          {/* Before Images (multi) */}
-          <View style={styles.formSection}>
-            <ImageUploader
-              images={beforeImages}
-              onChange={setBeforeImages}
-              maxImages={3}
-              label="Before Images"
-            />
-          </View>
-
-          {/* After Images (multi) */}
-          <View style={styles.formSection}>
-            <ImageUploader
-              images={afterImages}
-              onChange={setAfterImages}
-              maxImages={3}
-              label="After Images"
-            />
-          </View>
-
-          {/* Customer Signature */}
-          <View style={styles.formSection}>
-            <Text style={styles.formLabel}>Customer Signature</Text>
-            <TouchableOpacity
-              style={styles.signatureButton}
-              onPress={() => {
-                Alert.alert('Signature Pad', 'Signature capture functionality will be implemented');
-                setCustomerSignature('signature-placeholder');
-              }}
-            >
-              <Text style={styles.signatureButtonText}>✍️ Capture Signature</Text>
+      {/* Show Signature Pad Modal */}
+      {showSignaturePad ? (
+        <SignaturePad
+          onSignatureCapture={handleSignatureCapture}
+          onCancel={() => setShowSignaturePad(false)}
+        />
+      ) : (
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={styles.modalCloseButton}>✕</Text>
             </TouchableOpacity>
-            {customerSignature && <Text style={styles.imageStatus}>✓ Signature captured</Text>}
+            <Text style={styles.modalTitle}>Check-in Form</Text>
+            <View style={{ width: 30 }} />
           </View>
 
-          {/* Submit Button */}
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitButtonText}>Submit</Text>
-          </TouchableOpacity>
+          <ScrollView style={styles.modalContent}>
+            {/* Engineer Comments */}
+            <View style={styles.formSection}>
+              <Text style={styles.formLabel}>Engineer Comments</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter your comments here..."
+                placeholderTextColor="#999"
+                multiline
+                numberOfLines={4}
+                value={engineerComments}
+                onChangeText={setEngineerComments}
+              />
+            </View>
 
-          <View style={{ height: 20 }} />
-        </ScrollView>
-      </View>
+            {/* Before Images (multi) */}
+            <View style={styles.formSection}>
+              <ImageUploader
+                images={beforeImages}
+                onChange={setBeforeImages}
+                maxImages={3}
+                label="Before Images"
+              />
+            </View>
+
+            {/* After Images (multi) */}
+            <View style={styles.formSection}>
+              <ImageUploader
+                images={afterImages}
+                onChange={setAfterImages}
+                maxImages={3}
+                label="After Images"
+              />
+            </View>
+
+            {/* Customer Signature */}
+            <View style={styles.formSection}>
+              <Text style={styles.formLabel}>Customer Signature</Text>
+              <TouchableOpacity
+                style={styles.signatureButton}
+                onPress={() => setShowSignaturePad(true)}
+              >
+                <Text style={styles.signatureButtonText}>✍️ Capture Signature</Text>
+              </TouchableOpacity>
+              {customerSignature && (
+                <View style={styles.signaturePreview}>
+                  <Image
+                    source={{ uri: customerSignature }}
+                    style={styles.signatureThumbnail}
+                  />
+                  <Text style={styles.imageStatus}>✓ Signature captured</Text>
+                  <TouchableOpacity onPress={() => setCustomerSignature(null)}>
+                    <Text style={styles.removeSignatureText}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+
+            {/* Submit Button */}
+            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
+
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        </View>
+      )}
     </Modal>
   );
 };
@@ -195,6 +219,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#9c27b0',
+  },
+  signaturePreview: {
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  signatureThumbnail: {
+    width: '100%',
+    height: 120,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fafafa',
+  },
+  removeSignatureText: {
+    marginTop: 8,
+    color: '#d32f2f',
+    fontSize: 12,
+    fontWeight: '600',
   },
   imageStatus: {
     fontSize: 12,
