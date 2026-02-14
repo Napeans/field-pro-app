@@ -86,20 +86,18 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
     >
       <ScrollView
-        contentContainerStyle={GlobalStyles.scrollContent}
+        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.box}>
+        <View style={styles.card}>
           <View style={styles.iconContainer}>
-            <EmployeeIcon size={60} />
+            <EmployeeIcon size={72} />
           </View>
 
-          <Text style={GlobalStyles.title}>Welcome To Field Pro!</Text>
-          <Text style={GlobalStyles.subTitle}>Track your Work</Text>
+          <Text style={GlobalStyles.title}>Welcome to Field Pro</Text>
+          <Text style={GlobalStyles.subTitle}>Track your work, on time</Text>
 
-          <Text style={[GlobalStyles.inputHeader, { marginTop: 20 }]}>
-            Mobile Number
-          </Text>
+          <Text style={[GlobalStyles.inputHeader, { marginTop: 18 }]}>Mobile Number</Text>
 
           {/* <TextInput
             style={[GlobalStyles.input, { marginHorizontal: 20 }]}
@@ -152,7 +150,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
           <TouchableOpacity
             style={[
               GlobalStyles.button,
-              { marginHorizontal: 20 },
+              styles.loginButton,
               !isFormValid && GlobalStyles.disabledButton,
             ]}
             onPress={handleLogin}
@@ -180,68 +178,94 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f4f6f8',
   },
 
-  box: {
-    width: '100%',
-    paddingBottom: 40,
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 24,
+    marginHorizontal: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
   },
 
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
   },
 
   pinContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: 20,
+    marginHorizontal: 12,
     marginBottom: 30,
+    marginTop: 6,
   },
 
   pinBox: {
-    width: 60,
-    height: 60,
+    width: 56,
+    height: 56,
     borderWidth: 1.5,
-    borderColor: Colors.PRIMARY_BLUE,
+    borderColor: '#D1D5DB',
     borderRadius: 10,
     textAlign: 'center',
     fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.PRIMARY_BLUE,
+    fontWeight: '700',
+    color: '#0F172A',
     backgroundColor: '#fff',
   },
+
   mobileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: Colors.PRIMARY_BLUE, // green border
-    borderRadius: 6,
-    paddingHorizontal: 16,
-    height: 56,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 52,
     backgroundColor: '#fff',
-    marginLeft:20,
-    marginRight:20
+    marginTop: 8,
+    marginBottom: 12,
   },
-   countryCode: {
+
+  countryCode: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
+    fontWeight: '600',
+    color: '#0F172A',
     marginRight: 12,
   },
 
   divider: {
-    width: 1.5,
+    width: 1,
     height: 28,
-    backgroundColor: '#000',
+    backgroundColor: '#E5E7EB',
     marginRight: 12,
   },
 
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#000',
+    color: '#0F172A',
     paddingVertical: 0, // important for Android alignment
+  },
+
+  loginButton: {
+    marginTop: 8,
+    marginHorizontal: 0,
+    paddingVertical: 14,
+    borderRadius: 10,
+    backgroundColor: Colors.PRIMARY_BLUE,
+    alignItems: 'center',
   },
 });
