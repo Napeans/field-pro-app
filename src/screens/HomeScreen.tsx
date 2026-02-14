@@ -15,7 +15,7 @@ import {
 import { Colors } from '../theme/GlobalStyles';
 import CheckInForm from '../components/CheckInForm';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { BellAlertIcon,ArrowLeftIcon } from "react-native-heroicons/solid";
+import { BellAlertIcon, ArrowLeftIcon } from "react-native-heroicons/solid";
 const HomeScreen: React.FC = () => {
   const [allocatedJobs, setAllocatedJobs] = useState<Array<{
     id: string;
@@ -24,6 +24,7 @@ const HomeScreen: React.FC = () => {
     time: string;
     date: Date;
     checkedIn: boolean;
+      checkedOut: boolean;
     checkInTime: string | null;
     checkOutTime: string | null;
     customerName: string;
@@ -35,10 +36,10 @@ const HomeScreen: React.FC = () => {
     const lastWeek = new Date(); lastWeek.setDate(today.getDate() - 8);
 
     return [
-      { id: 'J-1001', title: 'Replace AC Filter', address: '123 Main St, Springfield', time: '08:00 AM', date: today, checkedIn: false, checkInTime: null, checkOutTime: null, customerName: 'John Smith', customerMobile: '+1-555-0101' },
-      { id: 'J-1002', title: 'Inspect Generator', address: '45 Industrial Rd, Shelbyville', time: '10:30 AM', date: yesterday, checkedIn: false, checkInTime: null, checkOutTime: null, customerName: 'Jane Doe', customerMobile: '+1-555-0102' },
-      { id: 'J-1003', title: 'Fix Leak', address: '88 River Ave, Ogden', time: '01:00 PM', date: tomorrow, checkedIn: false, checkInTime: null, checkOutTime: null, customerName: 'Mike Johnson', customerMobile: '+1-555-0103' },
-      { id: 'J-1004', title: 'Roof Inspection', address: '200 Hill St, Springfield', time: '03:00 PM', date: lastWeek, checkedIn: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
+      { id: 'J-1001', title: 'Replace AC Filter', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '08:00 AM', date: today, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'John Smith', customerMobile: '+1-555-0101' },
+      { id: 'J-1002', title: 'Inspect Generator', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '10:30 AM', date: yesterday, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Jane Doe', customerMobile: '+1-555-0102' },
+      { id: 'J-1003', title: 'Fix Leak', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '01:00 PM', date: tomorrow, checkedIn: false, checkedOut:false , checkInTime: null, checkOutTime: null, customerName: 'Mike Johnson', customerMobile: '+1-555-0103' },
+      { id: 'J-1004', title: 'Roof Inspection', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '03:00 PM', date: lastWeek, checkedIn:false , checkedOut:false , checkInTime:null , checkOutTime:null , customerName:'Sarah Williams' , customerMobile:'+1-555-0104' },
     ];
   });
 
@@ -52,8 +53,8 @@ const HomeScreen: React.FC = () => {
   const [selectedJobForForm, setSelectedJobForForm] = useState<string | null>(null);
 
   const filteredJobs = (() => {
-    const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
-    const endOfToday = new Date(startOfToday); endOfToday.setHours(23,59,59,999);
+    const startOfToday = new Date(); startOfToday.setHours(0, 0, 0, 0);
+    const endOfToday = new Date(startOfToday); endOfToday.setHours(23, 59, 59, 999);
     const endOfWeek = new Date(startOfToday); endOfWeek.setDate(endOfWeek.getDate() + 7);
 
     return allocatedJobs.filter(job => {
@@ -65,7 +66,11 @@ const HomeScreen: React.FC = () => {
       return true;
     });
   })();
-
+  const handleJobCheckCheckOut = (id: string) => {
+    const now = new Date();
+    const dateTimeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+   setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedOut: true, checkOutTime: dateTimeStr } : j)));
+  };
   const handleJobCheckIn = (id: string) => {
     // mark job as checked-in immediately and record timestamp
     setSelectedJobForForm(id);
@@ -75,7 +80,6 @@ const HomeScreen: React.FC = () => {
 
     setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedIn: true, checkInTime: dateTimeStr } : j)));
 
-    Alert.alert('Success', `Checked in to ${id} at ${dateTimeStr}`);
   };
 
   const handleCheckInSubmit = (formData: { engineerComments: string; beforeImage?: string | null; afterImage?: string | null; customerSignature?: string | null; }) => {
@@ -108,156 +112,182 @@ const HomeScreen: React.FC = () => {
   const [notifCount, setNotifCount] = useState<number>(100);
 
   return (
-      <View style={[{backgroundColor:'white'}]}>
+    <View style={[{ backgroundColor: 'white' }]}>
       <View
-    style={{
-      width: '100%',
-      height: 75,
-      backgroundColor: Colors.PRIMARY_BLUE,
-      paddingHorizontal: 15
-    }}
-  >
-    <View style={{marginTop: 30, flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',}}>
-    <TouchableOpacity
-      style={{ width: 44, height: '100%', justifyContent: 'center', alignItems: 'flex-start' }}
-      activeOpacity={0.7}
-    >
-      <ArrowLeftIcon size={28} color="white" />
-    </TouchableOpacity>
-
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ color: 'white', fontSize: 18, fontWeight: '600' }}>Home</Text>
-    </View>
-
-    <TouchableOpacity
-      style={{ width: 44, height: '100%', justifyContent: 'center', alignItems: 'flex-end', position: 'relative', overflow: 'visible' }}
-      activeOpacity={0.7}
-      onPress={() => { /* open notifications */ }}
-    >
-      <BellAlertIcon size={28} color="white" />
-
-      {notifCount > 0 && (
-        <View style={{ position: 'absolute', top: -6, right: -6, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: '#FF3B30', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 }}>
-          <Text style={{ color: 'white', fontSize: 11, fontWeight: '700' }}>{notifCount > 99 ? '99+' : notifCount}</Text>
-        </View>
-      )}
-    </TouchableOpacity>
-    </View>
-  </View>
-      
-  <View style={{ padding: 16 }}>
-    <View style={styles.filterBar}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator
-        contentContainerStyle={{ alignItems: 'center', paddingRight: 8 }}
+        style={{
+          width: '100%',
+          height: 75,
+          backgroundColor: Colors.PRIMARY_BLUE,
+          paddingHorizontal: 15
+        }}
       >
-        <View style={styles.filterChipsRow}>
-          <TouchableOpacity style={[styles.chip, filter === 'today' && styles.chipActive]} onPress={() => setFilter('today')}>
-            <Text style={[styles.chipText, filter === 'today' && styles.chipTextActive]}>Today</Text>
+        <View style={{
+          marginTop: 30, flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <TouchableOpacity
+            style={{ width: 44, height: '100%', justifyContent: 'center', alignItems: 'flex-start' }}
+            activeOpacity={0.7}
+          >
+            <ArrowLeftIcon size={28} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.chip, filter === 'week' && styles.chipActive]} onPress={() => setFilter('week')}>
-            <Text style={[styles.chipText, filter === 'week' && styles.chipTextActive]}>This Week</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.chip, filter === 'date' && styles.chipActive]} onPress={() => { setFilter('date'); setShowDatePicker(true); }}>
-            <Text style={[styles.chipText, filter === 'date' && styles.chipTextActive]}>Date{filter==='date' ? ` (${selectedDate.toLocaleDateString()})` : ''}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.chip, filter === 'all' && styles.chipActive]} onPress={() => setFilter('all')}>
-            <Text style={[styles.chipText, filter === 'all' && styles.chipTextActive]}>All</Text>
+
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: 'white', fontSize: 18, fontWeight: '600' }}>Home</Text>
+          </View>
+
+          <TouchableOpacity
+            style={{ width: 44, height: '100%', justifyContent: 'center', alignItems: 'flex-end', position: 'relative', overflow: 'visible' }}
+            activeOpacity={0.7}
+            onPress={() => { /* open notifications */ }}
+          >
+            <BellAlertIcon size={28} color="white" />
+
+            {notifCount > 0 && (
+              <View style={{ position: 'absolute', top: -6, right: -6, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: '#FF3B30', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 }}>
+                <Text style={{ color: 'white', fontSize: 11, fontWeight: '700' }}>{notifCount > 99 ? '99+' : notifCount}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
-      </ScrollView>
-      {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      </View>
+
+      <View style={{ padding: 16 }}>
+        <View style={styles.filterBar}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator
+            contentContainerStyle={{ alignItems: 'center', paddingRight: 8 }}
+          >
+            <View style={styles.filterChipsRow}>
+              <TouchableOpacity style={[styles.chip, filter === 'today' && styles.chipActive]} onPress={() => setFilter('today')}>
+                <Text style={[styles.chipText, filter === 'today' && styles.chipTextActive]}>Today</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.chip, filter === 'week' && styles.chipActive]} onPress={() => setFilter('week')}>
+                <Text style={[styles.chipText, filter === 'week' && styles.chipTextActive]}>This Week</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.chip, filter === 'date' && styles.chipActive]} onPress={() => { setFilter('date'); setShowDatePicker(true); }}>
+                <Text style={[styles.chipText, filter === 'date' && styles.chipTextActive]}>Date{filter === 'date' ? ` (${selectedDate.toLocaleDateString()})` : ''}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.chip, filter === 'all' && styles.chipActive]} onPress={() => setFilter('all')}>
+                <Text style={[styles.chipText, filter === 'all' && styles.chipTextActive]}>All</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+          {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text style={{ marginRight: 8, color: '#444' }}>Show past</Text>
         <Switch value={showPast} onValueChange={setShowPast} />
       </View> */}
-    </View>
+        </View>
 
-    <View style={{ marginTop: 8, marginBottom: 6 }}>
-      <Text style={{ fontSize: 14, color: '#444' }}>Showing {filteredJobs.length} of {allocatedJobs.length} jobs</Text>
-    </View>
+        <View style={{ marginTop: 8, marginBottom: 6 }}>
+          <Text style={{ fontSize: 14, color: '#444' }}>Showing {filteredJobs.length} of {allocatedJobs.length} jobs</Text>
+        </View>
 
-    <View style={{ marginTop: 12 }}>
-      <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 8 }}>Allocated Jobs</Text>
-      {filteredJobs.map(job => (
-        <View key={job.id} style={styles.jobTile}>
-          {/* Section 1: Job Details with Check-in Button */}
-          <View style={styles.jobSection1}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.jobId}>{job.id}</Text>
-              <Text style={styles.jobTitle}>{job.title}</Text>
-              <Text style={styles.jobAddress}>{job.address}</Text>
-              <View style={{ flexDirection: 'row', marginTop: 6, alignItems: 'center' }}>
-                <Text style={styles.jobTime}>{job.time}</Text>
-                <Text style={styles.jobDate}>{(job.date instanceof Date ? job.date : new Date(job.date)).toLocaleDateString()}</Text>
+        <View style={{ marginTop: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 8 }}>Allocated Jobs</Text>
+          {filteredJobs.map(job => (
+            <View key={job.id} style={styles.jobTile}>
+              {/* Section 1: Job Details with Check-in Button */}
+              <View style={styles.jobSection1}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.jobId}>{job.id}</Text>
+                  <Text style={styles.jobTitle}>{job.title}</Text>
+                  <Text style={styles.jobAddress}>{job.address}</Text>
+                  <View style={{ flexDirection: 'row', marginTop: 6, alignItems: 'center' }}>
+                    <Text style={styles.jobTime}>{job.time}</Text>
+                    <Text style={styles.jobDate}>{(job.date instanceof Date ? job.date : new Date(job.date)).toLocaleDateString()}</Text>
+                  </View>
+                </View>
+                {!job.checkedIn && (
+                  <TouchableOpacity
+                    style={[styles.jobButton, job.checkedIn ? styles.jobButtonChecked : null]}
+                    onPress={() => handleJobCheckIn(job.id)}
+                  >
+                    <Text style={styles.jobButtonText}>{job.checkedIn ? 'In' : 'Check'}</Text>
+                  </TouchableOpacity>
+                )}
+                { (job.checkedIn && !job.checkedOut) && (
+                  <View>
+                    <TouchableOpacity
+                      style={[styles.jobButton, job.checkedIn ? styles.jobButtonChecked : null]}
+                      onPress={() => handleJobCheckIn(job.id)}
+                    >
+                      <Text style={styles.jobButtonText}>Before Image</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.jobButton, job.checkedIn ? styles.jobButtonChecked : null, { marginTop: 8 }]}
+                      onPress={() => handleJobCheckIn(job.id)}
+                    >
+                      <Text style={styles.jobButtonText}>After Image</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.jobButton, job.checkedIn ? styles.jobButtonChecked : null, { marginTop: 8 }]}
+                      onPress={() => handleJobCheckCheckOut(job.id)}
+                    >
+                      <Text style={styles.jobButtonText}>Check Out</Text>
+                    </TouchableOpacity>
+                  </View>
+
+
+                )}
+              </View>
+
+              {/* Section 2: Customer Info */}
+              <View style={styles.jobSection2}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.customerName}>{job.customerName}</Text>
+                  <Text style={styles.customerMobile}>{job.customerMobile}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.callButton}
+                  onPress={() => handleCallCustomer(job.customerMobile, job.customerName)}
+                >
+                  <Text style={styles.callButtonText}>📞 Call</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Section 3: Check-in and Check-out Times */}
+              <View style={styles.jobSection3}>
+                <View style={{ flex: 1, alignItems: 'center' }}>
+                  <Text style={styles.timeLabel}>Check-in</Text>
+                  <Text style={styles.timeValue}>{job.checkInTime ? job.checkInTime.split(' ').slice(0, 1).join(' ') : '--'}</Text>
+                  <Text style={styles.timeSubLabel}>{job.checkInTime ? job.checkInTime.split(' ').slice(1).join(' ') : '--'}</Text>
+                </View>
+                <View style={{ flex: 1, alignItems: 'center' }}>
+                  <Text style={styles.timeLabel}>Check-out</Text>
+                  <Text style={styles.timeValue}>{job.checkOutTime ? job.checkOutTime.split(' ').slice(0, 1).join(' ') : '--'}</Text>
+                  <Text style={styles.timeSubLabel}>{job.checkOutTime ? job.checkOutTime.split(' ').slice(1).join(' ') : '--'}</Text>
+                </View>
               </View>
             </View>
-            {!job.checkedIn && (
-            <TouchableOpacity
-              style={[styles.jobButton, job.checkedIn ? styles.jobButtonChecked : null]}
-              onPress={() => handleJobCheckIn(job.id)}
-            >
-              <Text style={styles.jobButtonText}>{job.checkedIn ? 'In' : 'Check'}</Text>
-            </TouchableOpacity>
-            )}
-          </View>
+          ))}
 
-          {/* Section 2: Customer Info */}
-          <View style={styles.jobSection2}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.customerName}>{job.customerName}</Text>
-              <Text style={styles.customerMobile}>{job.customerMobile}</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.callButton}
-              onPress={() => handleCallCustomer(job.customerMobile, job.customerName)}
-            >
-              <Text style={styles.callButtonText}>📞 Call</Text>
-            </TouchableOpacity>
-          </View>
+          {filteredJobs.length === 0 && (
+            <Text style={{ color: '#666', marginTop: 8 }}>No jobs match the selected filter.</Text>
+          )}
 
-          {/* Section 3: Check-in and Check-out Times */}
-          <View style={styles.jobSection3}>
-            <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={styles.timeLabel}>Check-in</Text>
-              <Text style={styles.timeValue}>{job.checkInTime ? job.checkInTime.split(' ').slice(0, 1).join(' ') : '--'}</Text>
-              <Text style={styles.timeSubLabel}>{job.checkInTime ? job.checkInTime.split(' ').slice(1).join(' ') : '--'}</Text>
-            </View>
-            <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={styles.timeLabel}>Check-out</Text>
-              <Text style={styles.timeValue}>{job.checkOutTime ? job.checkOutTime.split(' ').slice(0, 1).join(' ') : '--'}</Text>
-              <Text style={styles.timeSubLabel}>{job.checkOutTime ? job.checkOutTime.split(' ').slice(1).join(' ') : '--'}</Text>
-            </View>
-          </View>
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setShowDatePicker(false);
+                if (date) setSelectedDate(date);
+              }}
+            />
+          )}
+
+          <CheckInForm
+            visible={showCheckInModal}
+            jobId={selectedJobForForm}
+            onClose={() => setShowCheckInModal(false)}
+            onSubmit={handleCheckInSubmit}
+          />
         </View>
-      ))}
-
-      {filteredJobs.length === 0 && (
-        <Text style={{ color: '#666', marginTop: 8 }}>No jobs match the selected filter.</Text>
-      )}
-
-      {showDatePicker && (
-        <DateTimePicker
-          value={selectedDate}
-          mode="date"
-          display="default"
-          onChange={(event, date) => {
-            setShowDatePicker(false);
-            if (date) setSelectedDate(date);
-          }}
-        />
-      )}
-
-      <CheckInForm
-        visible={showCheckInModal}
-        jobId={selectedJobForForm}
-        onClose={() => setShowCheckInModal(false)}
-        onSubmit={handleCheckInSubmit}
-      />
-    </View>
-  </View>
+      </View>
 
     </View>
   );
