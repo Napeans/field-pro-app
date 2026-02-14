@@ -68,7 +68,7 @@ const HomeScreen: React.FC = () => {
 
   const handleJobCheckIn = (id: string) => {
     setSelectedJobForForm(id);
-    setShowCheckInModal(true);
+    //setShowCheckInModal(true);
   };
 
   const handleCheckInSubmit = (formData: { engineerComments: string; beforeImage?: string | null; afterImage?: string | null; customerSignature?: string | null; }) => {
@@ -187,12 +187,14 @@ const HomeScreen: React.FC = () => {
                 <Text style={styles.jobDate}>{(job.date instanceof Date ? job.date : new Date(job.date)).toLocaleDateString()}</Text>
               </View>
             </View>
+            {!job.checkedIn && (
             <TouchableOpacity
               style={[styles.jobButton, job.checkedIn ? styles.jobButtonChecked : null]}
               onPress={() => handleJobCheckIn(job.id)}
             >
               <Text style={styles.jobButtonText}>{job.checkedIn ? 'In' : 'Check'}</Text>
             </TouchableOpacity>
+            )}
           </View>
 
           {/* Section 2: Customer Info */}
