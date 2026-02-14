@@ -51,7 +51,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
   };
 
   const handleSignatureCapture = (base64: string) => {
-    console.log('handleSignatureCapture called');
+    console.log('handleSignatureCapture called, signature length:', base64?.length);
     setCustomerSignature(base64);
     setShowSignaturePad(false);
     setLiveSignaturePreview(null);

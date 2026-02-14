@@ -22,18 +22,67 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
+  const [currentSignature, setCurrentSignature] = useState<string | null>(null);
 
   const handleOK = async () => {
+    console.log('handleOK called');
     try {
-      const signature = await signatureCanvasRef.current?.readSignature();
-      // If user has drawn something (hasSignature is true), proceed with capture
-      // even if readSignature returns unexpected format
-      if (hasSignature) {
-        onSignatureCapture(signature || '');
+      // Try to get signature from ref using available methods
+      let signature = null;
+      const ref = signatureCanvasRef.current;
+      
+      if (!ref) {
+        Alert.alert('Error', 'Canvas not ready');
+        return;
+      }
+      
+      // First try: use readSignature if available
+      if (typeof ref.readSignature === 'function') {
+        console.log('Trying readSignature...');
+        try {
+          signature = await ref.readSignature();
+          console.log('readSignature successful, length:', signature?.length);
+        } catch (e) {
+          console.log('readSignature failed:', e);
+        }
+      }
+      
+      // Second try: signatureToImageUrl if available
+      if (!signature && typeof ref.signatureToImageUrl === 'function') {
+        console.log('Trying signatureToImageUrl...');
+        try {
+          signature = await ref.signatureToImageUrl();
+          console.log('signatureToImageUrl successful, length:', signature?.length);
+        } catch (e) {
+          console.log('signatureToImageUrl failed:', e);
+        }
+      }
+      
+      // Third try: encodedSignature if available
+      if (!signature && typeof ref.encodedSignature === 'function') {
+        console.log('Trying encodedSignature...');
+        try {
+          signature = await ref.encodedSignature();
+          console.log('encodedSignature successful, length:', signature?.length);
+        } catch (e) {
+          console.log('encodedSignature failed:', e);
+        }
+      }
+      
+      // Fourth try: use currentSignature if onOK callback populated it
+      if (!signature && currentSignature) {
+        console.log('Using currentSignature from callback, length:', currentSignature.length);
+        signature = currentSignature;
+      }
+      
+      if (signature) {
+        console.log('Sending signature to parent');
+        onSignatureCapture(signature);
       } else {
-        Alert.alert('Error', 'Please draw a signature');
+        Alert.alert('Error', 'Could not capture signature. Please try again.');
       }
     } catch (error) {
+      console.log('Error in handleOK:', error);
       Alert.alert('Error', 'Failed to capture signature');
     }
   };
@@ -43,26 +92,16 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
     setIsDrawing(false);
     setHasSignature(false);
     setSignaturePreview(null);
+    setCurrentSignature(null);
   };
 
-  const capturePreview = async () => {
-    try {
-      const sig = await signatureCanvasRef.current?.readSignature();
-      console.log('capturePreview called, sig type:', typeof sig, 'length:', sig?.length);
-      
-      if (sig && typeof sig === 'string' && sig.trim() !== '') {
-        console.log('Valid signature, setting preview and calling onPreviewUpdate');
-        setSignaturePreview(sig);
-        // update parent component in real-time - IMPORTANT: callback to CheckInForm
-        if (onPreviewUpdate) {
-          console.log('Calling onPreviewUpdate callback');
-          onPreviewUpdate(sig);
-        }
-      } else {
-        console.log('Signature validation failed - sig:', sig?.substring?.(0, 50));
-      }
-    } catch (error) {
-      console.log('Preview capture error:', error);
+  // Called when signature is saved/confirmed
+  const handleSignatureSave = (signature: string) => {
+    console.log('handleSignatureSave called, signature length:', signature?.length);
+    setSignaturePreview(signature);
+    setCurrentSignature(signature);
+    if (onPreviewUpdate) {
+      onPreviewUpdate(signature);
     }
   };
 
@@ -78,14 +117,13 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
         onBegin={() => {
           setIsDrawing(true);
           setHasSignature(true);
+          console.log('Drawing started');
         }}
         onEnd={() => {
           setIsDrawing(false);
-          // Capture preview after user finishes stroke
-          setTimeout(() => {
-            capturePreview();
-          }, 100);
+          console.log('Stroke ended');
         }}
+        onOK={handleSignatureSave}
         penColor={Colors.PRIMARY_BLUE}
         style={styles.canvas}
       />
