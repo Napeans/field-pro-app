@@ -12,6 +12,7 @@ import {
   Linking,
 } from 'react-native';
 import { Colors } from '../theme/GlobalStyles';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { BellAlertIcon,ArrowLeftIcon } from "react-native-heroicons/solid";
 const HomeScreen: React.FC = () => {
   const [checkedIn, setCheckedIn] = useState<boolean>(false);
@@ -36,8 +37,10 @@ const HomeScreen: React.FC = () => {
     ];
   });
 
-  const [filter, setFilter] = useState<'today' | 'week' | 'all'>('today');
+  const [filter, setFilter] = useState<'today' | 'week' | 'all' | 'date'>('today');
   const [showPast, setShowPast] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 
   const filteredJobs = (() => {
     const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
@@ -49,6 +52,7 @@ const HomeScreen: React.FC = () => {
       if (!showPast && jd < startOfToday) return false;
       if (filter === 'today') return jd >= startOfToday && jd <= endOfToday;
       if (filter === 'week') return jd >= startOfToday && jd <= endOfWeek;
+      if (filter === 'date') return jd.toDateString() === selectedDate.toDateString();
       return true;
     });
   })();
@@ -121,6 +125,9 @@ const HomeScreen: React.FC = () => {
         <TouchableOpacity style={[styles.chip, filter === 'week' && styles.chipActive]} onPress={() => setFilter('week')}>
           <Text style={[styles.chipText, filter === 'week' && styles.chipTextActive]}>This Week</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={[styles.chip, filter === 'date' && styles.chipActive]} onPress={() => { setFilter('date'); setShowDatePicker(true); }}>
+          <Text style={[styles.chipText, filter === 'date' && styles.chipTextActive]}>Date{filter==='date' ? ` (${selectedDate.toLocaleDateString()})` : ''}</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={[styles.chip, filter === 'all' && styles.chipActive]} onPress={() => setFilter('all')}>
           <Text style={[styles.chipText, filter === 'all' && styles.chipTextActive]}>All</Text>
         </TouchableOpacity>
@@ -161,6 +168,18 @@ const HomeScreen: React.FC = () => {
 
       {filteredJobs.length === 0 && (
         <Text style={{ color: '#666', marginTop: 8 }}>No jobs match the selected filter.</Text>
+      )}
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          display="default"
+          onChange={(event, date) => {
+            setShowDatePicker(false);
+            if (date) setSelectedDate(date);
+          }}
+        />
       )}
     </View>
   </View>
