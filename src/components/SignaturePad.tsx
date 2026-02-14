@@ -6,7 +6,6 @@ import {
   Alert,
   StyleSheet,
   Modal,
-  Image,
 } from 'react-native';
 import SignatureCanvas from 'react-native-signature-canvas';
 import { Colors } from '../theme/GlobalStyles';
@@ -19,9 +18,7 @@ type SignaturePadProps = {
 
 const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCancel, onPreviewUpdate }) => {
   const signatureCanvasRef = useRef<any>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
-  const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
   const [currentSignature, setCurrentSignature] = useState<string | null>(null);
 
   const handleOK = async () => {
@@ -89,16 +86,13 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
 
   const handleClear = () => {
     signatureCanvasRef.current?.clearSignature();
-    setIsDrawing(false);
     setHasSignature(false);
-    setSignaturePreview(null);
     setCurrentSignature(null);
   };
 
   // Called when signature is saved/confirmed
   const handleSignatureSave = (signature: string) => {
     console.log('handleSignatureSave called, signature length:', signature?.length);
-    setSignaturePreview(signature);
     setCurrentSignature(signature);
     if (onPreviewUpdate) {
       onPreviewUpdate(signature);
@@ -115,12 +109,10 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
       <SignatureCanvas
         ref={signatureCanvasRef}
         onBegin={() => {
-          setIsDrawing(true);
           setHasSignature(true);
           console.log('Drawing started');
         }}
         onEnd={() => {
-          setIsDrawing(false);
           console.log('Stroke ended');
         }}
         onOK={handleSignatureSave}
@@ -128,25 +120,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
         style={styles.canvas}
       />
 
-      {/* Signature Preview Box */}
-      {signaturePreview && (
-        <View style={styles.previewBox}>
-          <Text style={styles.previewLabel}>Signature Preview</Text>
-          <Image 
-            source={{ uri: signaturePreview }} 
-            style={styles.previewImage}
-            resizeMode="contain"
-          />
-          <Text style={styles.previewStatus}>✓ Signature detected</Text>
-        </View>
-      )}
 
-      {/* Debug info if drawing but no preview */}
-      {isDrawing && !signaturePreview && (
-        <View style={styles.previewBox}>
-          <Text style={styles.previewLabel}>Drawing...</Text>
-        </View>
-      )}
 
       <View style={styles.buttonRow}>
         <TouchableOpacity
@@ -202,27 +176,7 @@ const styles = StyleSheet.create({
     margin: 16,
     backgroundColor: '#fafafa',
   },
-  previewBox: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#f9f9f9',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  previewLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.PRIMARY_BLUE,
-    marginBottom: 6,
-  },
-  previewImage: {
-    width: '100%',
-    height: 80,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
-  },
+
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -268,12 +222,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 14,
-  },
-  previewStatus: {
-    fontSize: 11,
-    color: '#4CAF50',
-    marginTop: 6,
-    fontWeight: '500',
   },
 });
 
