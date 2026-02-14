@@ -51,9 +51,15 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
   };
 
   const handleSignatureCapture = (base64: string) => {
+    console.log('handleSignatureCapture called');
     setCustomerSignature(base64);
     setShowSignaturePad(false);
     setLiveSignaturePreview(null);
+  };
+
+  const handlePreviewUpdate = (previewData: string) => {
+    console.log('handlePreviewUpdate called, data length:', previewData?.length);
+    setLiveSignaturePreview(previewData);
   };
 
   return (
@@ -66,7 +72,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
             setShowSignaturePad(false);
             setLiveSignaturePreview(null);
           }}
-          onPreviewUpdate={setLiveSignaturePreview}
+          onPreviewUpdate={handlePreviewUpdate}
         />
       ) : (
         <View style={styles.modalContainer}>
@@ -130,6 +136,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
                   <Image
                     source={{ uri: liveSignaturePreview }}
                     style={styles.livePreviewImage}
+                    resizeMode="contain"
                   />
                 </View>
               )}
@@ -141,6 +148,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
                   <Image
                     source={{ uri: customerSignature }}
                     style={styles.signatureThumbnail}
+                    resizeMode="contain"
                   />
                   <Text style={styles.imageStatus}>✓ Signature captured</Text>
                   <TouchableOpacity onPress={() => setCustomerSignature(null)}>

@@ -48,13 +48,21 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
   const capturePreview = async () => {
     try {
       const sig = await signatureCanvasRef.current?.readSignature();
-      setSignaturePreview(sig);
-      // update parent component in real-time
-      if (onPreviewUpdate && sig) {
-        onPreviewUpdate(sig);
+      console.log('capturePreview called, sig type:', typeof sig, 'length:', sig?.length);
+      
+      if (sig && typeof sig === 'string' && sig.trim() !== '') {
+        console.log('Valid signature, setting preview and calling onPreviewUpdate');
+        setSignaturePreview(sig);
+        // update parent component in real-time - IMPORTANT: callback to CheckInForm
+        if (onPreviewUpdate) {
+          console.log('Calling onPreviewUpdate callback');
+          onPreviewUpdate(sig);
+        }
+      } else {
+        console.log('Signature validation failed - sig:', sig?.substring?.(0, 50));
       }
     } catch (error) {
-      // silently fail, preview is optional
+      console.log('Preview capture error:', error);
     }
   };
 
@@ -73,7 +81,10 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
         }}
         onEnd={() => {
           setIsDrawing(false);
-          capturePreview();
+          // Capture preview after user finishes stroke
+          setTimeout(() => {
+            capturePreview();
+          }, 100);
         }}
         penColor={Colors.PRIMARY_BLUE}
         style={styles.canvas}
@@ -83,7 +94,19 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
       {signaturePreview && (
         <View style={styles.previewBox}>
           <Text style={styles.previewLabel}>Signature Preview</Text>
-          <Image source={{ uri: signaturePreview }} style={styles.previewImage} />
+          <Image 
+            source={{ uri: signaturePreview }} 
+            style={styles.previewImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.previewStatus}>✓ Signature detected</Text>
+        </View>
+      )}
+
+      {/* Debug info if drawing but no preview */}
+      {isDrawing && !signaturePreview && (
+        <View style={styles.previewBox}>
+          <Text style={styles.previewLabel}>Drawing...</Text>
         </View>
       )}
 
@@ -207,6 +230,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 14,
+  },
+  previewStatus: {
+    fontSize: 11,
+    color: '#4CAF50',
+    marginTop: 6,
+    fontWeight: '500',
   },
 });
 
