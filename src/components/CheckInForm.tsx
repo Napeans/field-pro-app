@@ -26,13 +26,19 @@ type CheckInFormProps = {
   }) => void;
 };
 
-const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSubmit }) => {
-  const [engineerComments, setEngineerComments] = useState<string>('');
+const CheckInForm: React.FC<CheckInFormProps> = ({
+  visible,
+  jobId,
+  onClose,
+  onSubmit,
+}) => {
+  const [engineerComments, setEngineerComments] = useState('');
   const [beforeImages, setBeforeImages] = useState<string[]>([]);
   const [afterImages, setAfterImages] = useState<string[]>([]);
-  const [customerSignature, setCustomerSignature] = useState<string | null>(null);
+  const [customerSignature, setCustomerSignature] = useState<string | null>(
+    null
+  );
   const [showSignaturePad, setShowSignaturePad] = useState(false);
-  const [liveSignaturePreview, setLiveSignaturePreview] = useState<string | null>(null);
 
   const handleSubmit = () => {
     if (!engineerComments.trim()) {
@@ -40,47 +46,48 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
       return;
     }
 
-    onSubmit({ engineerComments, beforeImages, afterImages, customerSignature });
+    onSubmit({
+      engineerComments,
+      beforeImages,
+      afterImages,
+      customerSignature,
+    });
 
-    // clear for next open
+    // reset after submit
     setEngineerComments('');
     setBeforeImages([]);
     setAfterImages([]);
     setCustomerSignature(null);
-    setLiveSignaturePreview(null);
   };
 
   const handleSignatureCapture = (base64: string) => {
-    console.log('handleSignatureCapture called, signature length:', base64?.length);
+    console.log('Signature captured length:', base64?.length);
     setCustomerSignature(base64);
     setShowSignaturePad(false);
-    setLiveSignaturePreview(null);
-  };
-
-  const handlePreviewUpdate = (previewData: string) => {
-    console.log('handlePreviewUpdate called, data length:', previewData?.length);
-    setLiveSignaturePreview(previewData);
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
-      {/* Show Signature Pad Modal */}
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={false}
+      onRequestClose={onClose}
+    >
       {showSignaturePad ? (
         <SignaturePad
           onSignatureCapture={handleSignatureCapture}
-          onCancel={() => {
-            setShowSignaturePad(false);
-            setLiveSignaturePreview(null);
-          }}
-          onPreviewUpdate={handlePreviewUpdate}
+          onCancel={() => setShowSignaturePad(false)}
         />
       ) : (
         <View style={styles.modalContainer}>
+          {/* HEADER */}
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={onClose}>
               <Text style={styles.modalCloseButton}>✕</Text>
             </TouchableOpacity>
+
             <Text style={styles.modalTitle}>Check-in Form</Text>
+
             <View style={{ width: 30 }} />
           </View>
 
@@ -90,7 +97,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
               <Text style={styles.formLabel}>Engineer Comments</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="Enter your comments here..."
+                placeholder="Enter your comments..."
                 placeholderTextColor="#999"
                 multiline
                 numberOfLines={4}
@@ -99,7 +106,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
               />
             </View>
 
-            {/* Before Images (multi) */}
+            {/* Before Images */}
             <View style={styles.formSection}>
               <ImageUploader
                 images={beforeImages}
@@ -109,7 +116,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
               />
             </View>
 
-            {/* After Images (multi) */}
+            {/* After Images */}
             <View style={styles.formSection}>
               <ImageUploader
                 images={afterImages}
@@ -120,50 +127,57 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
             </View>
 
             {/* Customer Signature */}
-            <View style={styles.formSection}>
-              <Text style={styles.formLabel}>Customer Signature</Text>
-              <TouchableOpacity
-                style={styles.signatureButton}
-                onPress={() => setShowSignaturePad(true)}
-              >
-                <Text style={styles.signatureButtonText}>✍️ Capture Signature</Text>
-              </TouchableOpacity>
-              
-              {/* Live Preview while Drawing */}
-              {liveSignaturePreview && (
-                <View style={styles.livePreview}>
-                  <Text style={styles.livePreviewLabel}>Live Preview (Drawing in progress)</Text>
-                  <Image
-                    source={{ uri: liveSignaturePreview }}
-                    style={styles.livePreviewImage}
-                    resizeMode="contain"
-                  />
-                </View>
-              )}
-              
-              {/* Captured Signature */}
-              {customerSignature && (
-                <View style={styles.signaturePreview}>
-                  <Text style={styles.signatureLabel}>Captured Signature</Text>
-                  <Image
-                    source={{ uri: customerSignature }}
-                    style={styles.signatureThumbnail}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.imageStatus}>✓ Signature captured</Text>
-                  <TouchableOpacity onPress={() => setCustomerSignature(null)}>
-                    <Text style={styles.removeSignatureText}>Remove</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
+            {!customerSignature && (
+              <View style={styles.formSection}>
+                <Text style={styles.formLabel}>Customer Signature</Text>
 
-            {/* Submit Button */}
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                <TouchableOpacity
+                  style={styles.signatureButton}
+                  onPress={() => setShowSignaturePad(true)}
+                >
+                  <Text style={styles.signatureButtonText}>
+                    ✍️ Capture Signature
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Signature Preview */}
+            {customerSignature && (
+              <View style={styles.signaturePreview}>
+                <Text style={styles.signatureLabel}>
+                  Captured Signature
+                </Text>
+
+                <Image
+                  source={{ uri: customerSignature }}
+                  style={styles.signatureThumbnail}
+                  resizeMode="contain"
+                />
+
+                <Text style={styles.imageStatus}>
+                  ✓ Signature captured
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() => setCustomerSignature(null)}
+                >
+                  <Text style={styles.removeSignatureText}>
+                    Remove
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Submit */}
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmit}
+            >
               <Text style={styles.submitButtonText}>Submit</Text>
             </TouchableOpacity>
 
-            <View style={{ height: 20 }} />
+            <View style={{ height: 30 }} />
           </ScrollView>
         </View>
       )}
@@ -178,8 +192,8 @@ const styles = StyleSheet.create({
   },
   modalHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: Colors.PRIMARY_BLUE,
     paddingVertical: 15,
     paddingHorizontal: 15,
@@ -195,9 +209,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   modalContent: {
-    flex: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 15,
+    padding: 15,
   },
   formSection: {
     marginBottom: 20,
@@ -205,44 +217,27 @@ const styles = StyleSheet.create({
   formLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111',
     marginBottom: 8,
+    color: '#111',
   },
   textInput: {
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    padding: 12,
     fontSize: 14,
     color: '#111',
     textAlignVertical: 'top',
-  },
-  imageButton: {
-    backgroundColor: '#e3f2fd',
-    borderWidth: 1,
-    borderColor: Colors.PRIMARY_BLUE,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    alignItems: 'center',
-  },
-  imageButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.PRIMARY_BLUE,
   },
   signatureButton: {
     backgroundColor: '#f3e5f5',
     borderWidth: 1,
     borderColor: '#9c27b0',
     borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    alignItems: 'center',
     minHeight: 100,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   signatureButtonText: {
     fontSize: 14,
@@ -250,36 +245,13 @@ const styles = StyleSheet.create({
     color: '#9c27b0',
   },
   signaturePreview: {
-    marginTop: 12,
-    padding: 12,
     backgroundColor: '#fff',
     borderWidth: 2,
     borderColor: Colors.PRIMARY_BLUE,
     borderRadius: 8,
-    alignItems: 'center',
-  },
-  livePreview: {
-    marginTop: 12,
     padding: 12,
-    backgroundColor: '#f0f7ff',
-    borderWidth: 2,
-    borderColor: '#64b5f6',
-    borderRadius: 8,
     alignItems: 'center',
-  },
-  livePreviewLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#1976d2',
-    marginBottom: 8,
-  },
-  livePreviewImage: {
-    width: '100%',
-    height: 100,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#90caf9',
-    backgroundColor: '#fff',
+    marginBottom: 20,
   },
   signatureLabel: {
     fontSize: 13,
@@ -295,23 +267,22 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     backgroundColor: '#fafafa',
   },
-  removeSignatureText: {
-    marginTop: 8,
-    color: '#d32f2f',
-    fontSize: 12,
-    fontWeight: '600',
-  },
   imageStatus: {
     fontSize: 12,
     color: '#4CAF50',
     marginTop: 8,
     fontWeight: '500',
   },
+  removeSignatureText: {
+    marginTop: 8,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#d32f2f',
+  },
   submitButton: {
     backgroundColor: Colors.PRIMARY_BLUE,
     borderRadius: 8,
     paddingVertical: 14,
-    paddingHorizontal: 20,
     alignItems: 'center',
     marginTop: 10,
   },
