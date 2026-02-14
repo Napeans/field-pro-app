@@ -96,8 +96,8 @@ const HomeScreen: React.FC = () => {
           <View style={{ flex: 1 }}>
             <Text style={styles.jobId}>{job.id}</Text>
             <Text style={styles.jobTitle}>{job.title}</Text>
-            <Text style={{ color: '#666', marginTop: 4 }}>{job.address}</Text>
-            <Text style={{ color: '#666', marginTop: 4 }}>{job.time}</Text>
+            <Text style={styles.jobAddress}>{job.address}</Text>
+            <Text style={styles.jobTime}>{job.time}</Text>
           </View>
 
           <TouchableOpacity
@@ -152,11 +152,18 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   jobItem: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    justifyContent: 'space-between',
   },
   jobId: {
     fontSize: 12,
@@ -168,10 +175,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#111',
   },
+  jobAddress: {
+    color: '#666',
+    marginTop: 6,
+    fontSize: 13,
+  },
+  jobTime: {
+    color: '#666',
+    marginTop: 4,
+    fontSize: 13,
+  },
   jobButton: {
     backgroundColor: Colors.PRIMARY_BLUE,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 6,
   },
   jobButtonChecked: {
