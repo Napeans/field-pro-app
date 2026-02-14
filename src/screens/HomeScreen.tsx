@@ -13,7 +13,7 @@ import {
 import { Colors } from '../theme/GlobalStyles';
 import { BellAlertIcon,ArrowLeftIcon } from "react-native-heroicons/solid";
 const HomeScreen: React.FC = () => {
- 
+  const [notifCount, setNotifCount] = useState<number>(100);
 
   return (
       <View style={[{backgroundColor:'white'}]}>
@@ -40,10 +40,17 @@ const HomeScreen: React.FC = () => {
     </View>
 
     <TouchableOpacity
-      style={{ width: 44, height: '100%', justifyContent: 'center', alignItems: 'flex-end' }}
+      style={{ width: 44, height: '100%', justifyContent: 'center', alignItems: 'flex-end', position: 'relative', overflow: 'visible' }}
       activeOpacity={0.7}
+      onPress={() => { /* open notifications */ }}
     >
       <BellAlertIcon size={28} color="white" />
+
+      {notifCount > 0 && (
+        <View style={{ position: 'absolute', top: -6, right: -6, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: '#FF3B30', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 }}>
+          <Text style={{ color: 'white', fontSize: 11, fontWeight: '700' }}>{notifCount > 99 ? '99+' : notifCount}</Text>
+        </View>
+      )}
     </TouchableOpacity>
     </View>
   </View>
