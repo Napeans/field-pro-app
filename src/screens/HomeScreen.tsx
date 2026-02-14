@@ -64,9 +64,10 @@ const HomeScreen: React.FC = () => {
     const job = allocatedJobs.find(j => j.id === id);
     if (!job) return;
     const willBeCheckedIn = !job.checkedIn;
-    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedIn: willBeCheckedIn, checkInTime: willBeCheckedIn ? now : j.checkInTime, checkOutTime: !willBeCheckedIn ? now : j.checkOutTime } : j)));
-    Alert.alert('Job Check-in', willBeCheckedIn ? `Checked in to ${job.id} at ${now}` : `Checked out of ${job.id} at ${now}`);
+    const now = new Date();
+    const dateTimeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedIn: willBeCheckedIn, checkInTime: willBeCheckedIn ? dateTimeStr : j.checkInTime, checkOutTime: !willBeCheckedIn ? dateTimeStr : j.checkOutTime } : j)));
+    Alert.alert('Job Check-in', willBeCheckedIn ? `Checked in to ${job.id} at ${dateTimeStr}` : `Checked out of ${job.id} at ${dateTimeStr}`);
   };
 
   const handleCallCustomer = (phone: string, name: string) => {
@@ -183,11 +184,13 @@ const HomeScreen: React.FC = () => {
           <View style={styles.jobSection3}>
             <View style={{ flex: 1, alignItems: 'center' }}>
               <Text style={styles.timeLabel}>Check-in</Text>
-              <Text style={styles.timeValue}>{job.checkInTime || '--:--'}</Text>
+              <Text style={styles.timeValue}>{job.checkInTime ? job.checkInTime.split(' ').slice(0, 1).join(' ') : '--'}</Text>
+              <Text style={styles.timeSubLabel}>{job.checkInTime ? job.checkInTime.split(' ').slice(1).join(' ') : '--'}</Text>
             </View>
             <View style={{ flex: 1, alignItems: 'center' }}>
               <Text style={styles.timeLabel}>Check-out</Text>
-              <Text style={styles.timeValue}>{job.checkOutTime || '--:--'}</Text>
+              <Text style={styles.timeValue}>{job.checkOutTime ? job.checkOutTime.split(' ').slice(0, 1).join(' ') : '--'}</Text>
+              <Text style={styles.timeSubLabel}>{job.checkOutTime ? job.checkOutTime.split(' ').slice(1).join(' ') : '--'}</Text>
             </View>
           </View>
         </View>
@@ -324,6 +327,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#111',
+  },
+  timeSubLabel: {
+    fontSize: 11,
+    color: '#666',
+    marginTop: 2,
   },
   callButton: {
     backgroundColor: '#4CAF50',
