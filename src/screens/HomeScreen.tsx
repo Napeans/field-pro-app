@@ -145,7 +145,7 @@ const HomeScreen: React.FC = () => {
     <View style={{ marginTop: 12 }}>
       <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 8 }}>Allocated Jobs</Text>
       {filteredJobs.map(job => (
-        <View key={job.id} style={{ marginBottom: 12 }}>
+        <View key={job.id} style={styles.jobTile}>
           {/* Section 1: Job Details with Check-in Button */}
           <View style={styles.jobSection1}>
             <View style={{ flex: 1 }}>
@@ -246,11 +246,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  jobTile: {
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    marginBottom: 12,
+    marginHorizontal: 0,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
   jobSection1: {
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
     padding: 12,
-    marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -259,16 +270,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
     padding: 12,
-    marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   jobSection3: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
     padding: 12,
-    marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
