@@ -67,8 +67,15 @@ const HomeScreen: React.FC = () => {
   })();
 
   const handleJobCheckIn = (id: string) => {
+    // mark job as checked-in immediately and record timestamp
     setSelectedJobForForm(id);
-    //setShowCheckInModal(true);
+
+    const now = new Date();
+    const dateTimeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedIn: true, checkInTime: dateTimeStr } : j)));
+
+    Alert.alert('Success', `Checked in to ${id} at ${dateTimeStr}`);
   };
 
   const handleCheckInSubmit = (formData: { engineerComments: string; beforeImage?: string | null; afterImage?: string | null; customerSignature?: string | null; }) => {
