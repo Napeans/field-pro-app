@@ -10,12 +10,10 @@ import {
   Platform,
   Alert,
   Linking,
-  Modal,
   ScrollView,
-  TextInput,
-  Image,
 } from 'react-native';
 import { Colors } from '../theme/GlobalStyles';
+import CheckInForm from '../components/CheckInForm';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { BellAlertIcon,ArrowLeftIcon } from "react-native-heroicons/solid";
 const HomeScreen: React.FC = () => {
@@ -52,10 +50,6 @@ const HomeScreen: React.FC = () => {
   // Check-in Form Modal States
   const [showCheckInModal, setShowCheckInModal] = useState<boolean>(false);
   const [selectedJobForForm, setSelectedJobForForm] = useState<string | null>(null);
-  const [engineerComments, setEngineerComments] = useState<string>('');
-  const [beforeImage, setBeforeImage] = useState<string | null>(null);
-  const [afterImage, setAfterImage] = useState<string | null>(null);
-  const [customerSignature, setCustomerSignature] = useState<string | null>(null);
 
   const filteredJobs = (() => {
     const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
@@ -74,16 +68,13 @@ const HomeScreen: React.FC = () => {
 
   const handleJobCheckIn = (id: string) => {
     setSelectedJobForForm(id);
-    setEngineerComments('');
-    setBeforeImage(null);
-    setAfterImage(null);
-    setCustomerSignature(null);
     setShowCheckInModal(true);
   };
 
-  const handleCheckInFormSubmit = () => {
+  const handleCheckInSubmit = (formData: { engineerComments: string; beforeImage?: string | null; afterImage?: string | null; customerSignature?: string | null; }) => {
     if (!selectedJobForForm) return;
-    
+    const { engineerComments } = formData;
+
     if (!engineerComments.trim()) {
       Alert.alert('Error', 'Please enter engineer comments');
       return;
@@ -94,11 +85,11 @@ const HomeScreen: React.FC = () => {
 
     const now = new Date();
     const dateTimeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
+
     setAllocatedJobs(prev => prev.map(j => (j.id === selectedJobForForm ? { ...j, checkedIn: true, checkInTime: dateTimeStr } : j)));
-    
+
     Alert.alert('Success', `Checked in to ${job.id} at ${dateTimeStr}\n\nEngineer Comments: ${engineerComments}`);
-    
+
     setShowCheckInModal(false);
   };
 
@@ -250,100 +241,12 @@ const HomeScreen: React.FC = () => {
         />
       )}
 
-      {/* Check-in Form Modal */}
-      <Modal
+      <CheckInForm
         visible={showCheckInModal}
-        animationType="slide"
-        transparent={false}
-        onRequestClose={() => setShowCheckInModal(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setShowCheckInModal(false)}>
-              <Text style={styles.modalCloseButton}>✕</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Check-in Form</Text>
-            <View style={{ width: 30 }} />
-          </View>
-
-          <ScrollView style={styles.modalContent}>
-            {/* Engineer Comments */}
-            <View style={styles.formSection}>
-              <Text style={styles.formLabel}>Engineer Comments</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Enter your comments here..."
-                placeholderTextColor="#999"
-                multiline
-                numberOfLines={4}
-                value={engineerComments}
-                onChangeText={setEngineerComments}
-              />
-            </View>
-
-            {/* Before Image */}
-            <View style={styles.formSection}>
-              <Text style={styles.formLabel}>Before Image</Text>
-              <TouchableOpacity
-                style={styles.imageButton}
-                onPress={() => {
-                  Alert.alert('Image Picker', 'Camera or Gallery functionality will be implemented');
-                  setBeforeImage('before-image-placeholder');
-                }}
-              >
-                <Text style={styles.imageButtonText}>📷 Capture / Upload Before Image</Text>
-              </TouchableOpacity>
-              {beforeImage && (
-                <Text style={styles.imageStatus}>✓ Before image added</Text>
-              )}
-            </View>
-
-            {/* After Image */}
-            <View style={styles.formSection}>
-              <Text style={styles.formLabel}>After Image</Text>
-              <TouchableOpacity
-                style={styles.imageButton}
-                onPress={() => {
-                  Alert.alert('Image Picker', 'Camera or Gallery functionality will be implemented');
-                  setAfterImage('after-image-placeholder');
-                }}
-              >
-                <Text style={styles.imageButtonText}>📷 Capture / Upload After Image</Text>
-              </TouchableOpacity>
-              {afterImage && (
-                <Text style={styles.imageStatus}>✓ After image added</Text>
-              )}
-            </View>
-
-            {/* Customer Signature */}
-            <View style={styles.formSection}>
-              <Text style={styles.formLabel}>Customer Signature</Text>
-              <TouchableOpacity
-                style={styles.signatureButton}
-                onPress={() => {
-                  Alert.alert('Signature Pad', 'Signature capture functionality will be implemented');
-                  setCustomerSignature('signature-placeholder');
-                }}
-              >
-                <Text style={styles.signatureButtonText}>✍️ Capture Signature</Text>
-              </TouchableOpacity>
-              {customerSignature && (
-                <Text style={styles.imageStatus}>✓ Signature captured</Text>
-              )}
-            </View>
-
-            {/* Submit Button */}
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleCheckInFormSubmit}
-            >
-              <Text style={styles.submitButtonText}>Submit</Text>
-            </TouchableOpacity>
-
-            <View style={{ height: 20 }} />
-          </ScrollView>
-        </View>
-      </Modal>
+        jobId={selectedJobForForm}
+        onClose={() => setShowCheckInModal(false)}
+        onSubmit={handleCheckInSubmit}
+      />
     </View>
   </View>
 
