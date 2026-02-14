@@ -24,11 +24,16 @@ const HomeScreen: React.FC = () => {
     time: string;
     date: Date;
     checkedIn: boolean;
-      checkedOut: boolean;
+    checkedOut: boolean;
     checkInTime: string | null;
     checkOutTime: string | null;
     customerName: string;
     customerMobile: string;
+    // optional persisted check-in details
+    engineerComments?: string;
+    beforeImages?: string[];
+    afterImages?: string[];
+    customerSignature?: string | null;
   }>>(() => {
     const today = new Date();
     const yesterday = new Date(); yesterday.setDate(today.getDate() - 2);
@@ -80,11 +85,13 @@ const HomeScreen: React.FC = () => {
 
     setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedIn: true, checkInTime: dateTimeStr } : j)));
 
+    // open form so user can add comments / images
+    setShowCheckInModal(true);
   };
 
-  const handleCheckInSubmit = (formData: { engineerComments: string; beforeImage?: string | null; afterImage?: string | null; customerSignature?: string | null; }) => {
+  const handleCheckInSubmit = (formData: { engineerComments: string; beforeImages?: string[]; afterImages?: string[]; customerSignature?: string | null; }) => {
     if (!selectedJobForForm) return;
-    const { engineerComments } = formData;
+    const { engineerComments, beforeImages = [], afterImages = [], customerSignature = null } = formData;
 
     if (!engineerComments.trim()) {
       Alert.alert('Error', 'Please enter engineer comments');
@@ -97,9 +104,17 @@ const HomeScreen: React.FC = () => {
     const now = new Date();
     const dateTimeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    setAllocatedJobs(prev => prev.map(j => (j.id === selectedJobForForm ? { ...j, checkedIn: true, checkInTime: dateTimeStr } : j)));
+    setAllocatedJobs(prev => prev.map(j => (j.id === selectedJobForForm ? { 
+      ...j,
+      checkedIn: true,
+      checkInTime: dateTimeStr,
+      engineerComments,
+      beforeImages,
+      afterImages,
+      customerSignature,
+    } : j)));
 
-    Alert.alert('Success', `Checked in to ${job.id} at ${dateTimeStr}\n\nEngineer Comments: ${engineerComments}`);
+    Alert.alert('Success', `Checked in to ${job.id} at ${dateTimeStr}\n\nEngineer Comments: ${engineerComments}\nBefore images: ${beforeImages.length}\nAfter images: ${afterImages.length}`);
 
     setShowCheckInModal(false);
   };
@@ -286,6 +301,7 @@ const HomeScreen: React.FC = () => {
             onClose={() => setShowCheckInModal(false)}
             onSubmit={handleCheckInSubmit}
           />
+        
         </View>
       </View>
 

@@ -10,6 +10,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Colors } from '../theme/GlobalStyles';
+import ImageUploader from './ImageUploader';
 
 type CheckInFormProps = {
   visible: boolean;
@@ -17,16 +18,16 @@ type CheckInFormProps = {
   onClose: () => void;
   onSubmit: (data: {
     engineerComments: string;
-    beforeImage?: string | null;
-    afterImage?: string | null;
+    beforeImages?: string[];
+    afterImages?: string[];
     customerSignature?: string | null;
   }) => void;
 };
 
 const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSubmit }) => {
   const [engineerComments, setEngineerComments] = useState<string>('');
-  const [beforeImage, setBeforeImage] = useState<string | null>(null);
-  const [afterImage, setAfterImage] = useState<string | null>(null);
+  const [beforeImages, setBeforeImages] = useState<string[]>([]);
+  const [afterImages, setAfterImages] = useState<string[]>([]);
   const [customerSignature, setCustomerSignature] = useState<string | null>(null);
 
   const handleSubmit = () => {
@@ -35,12 +36,12 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
       return;
     }
 
-    onSubmit({ engineerComments, beforeImage, afterImage, customerSignature });
+    onSubmit({ engineerComments, beforeImages, afterImages, customerSignature });
 
-    // keep form clear for next open (parent closes modal)
+    // clear for next open
     setEngineerComments('');
-    setBeforeImage(null);
-    setAfterImage(null);
+    setBeforeImages([]);
+    setAfterImages([]);
     setCustomerSignature(null);
   };
 
@@ -70,34 +71,24 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ visible, jobId, onClose, onSu
             />
           </View>
 
-          {/* Before Image */}
+          {/* Before Images (multi) */}
           <View style={styles.formSection}>
-            <Text style={styles.formLabel}>Before Image</Text>
-            <TouchableOpacity
-              style={styles.imageButton}
-              onPress={() => {
-                Alert.alert('Image Picker', 'Camera or Gallery functionality will be implemented');
-                setBeforeImage('before-image-placeholder');
-              }}
-            >
-              <Text style={styles.imageButtonText}>📷 Capture / Upload Before Image</Text>
-            </TouchableOpacity>
-            {beforeImage && <Text style={styles.imageStatus}>✓ Before image added</Text>}
+            <ImageUploader
+              images={beforeImages}
+              onChange={setBeforeImages}
+              maxImages={3}
+              label="Before Images"
+            />
           </View>
 
-          {/* After Image */}
+          {/* After Images (multi) */}
           <View style={styles.formSection}>
-            <Text style={styles.formLabel}>After Image</Text>
-            <TouchableOpacity
-              style={styles.imageButton}
-              onPress={() => {
-                Alert.alert('Image Picker', 'Camera or Gallery functionality will be implemented');
-                setAfterImage('after-image-placeholder');
-              }}
-            >
-              <Text style={styles.imageButtonText}>📷 Capture / Upload After Image</Text>
-            </TouchableOpacity>
-            {afterImage && <Text style={styles.imageStatus}>✓ After image added</Text>}
+            <ImageUploader
+              images={afterImages}
+              onChange={setAfterImages}
+              maxImages={3}
+              label="After Images"
+            />
           </View>
 
           {/* Customer Signature */}
