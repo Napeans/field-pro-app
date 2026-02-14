@@ -14,10 +14,16 @@ import { Colors } from '../theme/GlobalStyles';
 import { BellAlertIcon,ArrowLeftIcon } from "react-native-heroicons/solid";
 const HomeScreen: React.FC = () => {
   const [checkedIn, setCheckedIn] = useState<boolean>(false);
-  const [allocatedJobs, setAllocatedJobs] = useState<{id: string; title: string; location: string; time: string;}[]>([
-    { id: 'J-1001', title: 'Replace AC Filter', location: 'Site A', time: '08:00 AM' },
-    { id: 'J-1002', title: 'Inspect Generator', location: 'Site B', time: '10:30 AM' },
-    { id: 'J-1003', title: 'Fix Leak', location: 'Site C', time: '01:00 PM' },
+  const [allocatedJobs, setAllocatedJobs] = useState<Array<{
+    id: string;
+    title: string;
+    address: string;
+    time: string;
+    checkedIn: boolean;
+  }>>([
+    { id: 'J-1001', title: 'Replace AC Filter', address: '123 Main St, Springfield', time: '08:00 AM', checkedIn: false },
+    { id: 'J-1002', title: 'Inspect Generator', address: '45 Industrial Rd, Shelbyville', time: '10:30 AM', checkedIn: false },
+    { id: 'J-1003', title: 'Fix Leak', address: '88 River Ave, Ogden', time: '01:00 PM', checkedIn: false },
   ]);
 
   const handleCheckIn = () => {
@@ -27,6 +33,14 @@ const HomeScreen: React.FC = () => {
 
   const handleJobPress = (id: string) => {
     Alert.alert('Job selected', `Open job ${id}`);
+  };
+
+  const handleJobCheckIn = (id: string) => {
+    const job = allocatedJobs.find(j => j.id === id);
+    if (!job) return;
+    const willBeCheckedIn = !job.checkedIn;
+    setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedIn: willBeCheckedIn } : j)));
+    Alert.alert('Job Check-in', willBeCheckedIn ? `Checked in to ${job.id}` : `Checked out of ${job.id}`);
   };
 
   const [notifCount, setNotifCount] = useState<number>(100);
@@ -80,11 +94,17 @@ const HomeScreen: React.FC = () => {
       {allocatedJobs.map(job => (
         <View key={job.id} style={styles.jobItem}>
           <View style={{ flex: 1 }}>
+            <Text style={styles.jobId}>{job.id}</Text>
             <Text style={styles.jobTitle}>{job.title}</Text>
-            <Text style={{ color: '#666' }}>{job.location} • {job.time}</Text>
+            <Text style={{ color: '#666', marginTop: 4 }}>{job.address}</Text>
+            <Text style={{ color: '#666', marginTop: 4 }}>{job.time}</Text>
           </View>
-          <TouchableOpacity style={styles.jobButton} onPress={() => handleJobPress(job.id)}>
-            <Text style={styles.jobButtonText}>Start</Text>
+
+          <TouchableOpacity
+            style={[styles.jobButton, job.checkedIn ? styles.jobButtonChecked : null]}
+            onPress={() => handleJobCheckIn(job.id)}
+          >
+            <Text style={styles.jobButtonText}>{job.checkedIn ? 'Checked In' : 'Check In'}</Text>
           </TouchableOpacity>
         </View>
       ))}
@@ -138,6 +158,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
+  jobId: {
+    fontSize: 12,
+    color: '#888',
+    marginBottom: 4,
+  },
   jobTitle: {
     fontSize: 15,
     fontWeight: '600',
@@ -148,6 +173,9 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 6,
+  },
+  jobButtonChecked: {
+    backgroundColor: '#4CAF50',
   },
   jobButtonText: {
     color: '#fff',
