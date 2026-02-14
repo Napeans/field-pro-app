@@ -114,12 +114,12 @@ const HomeScreen: React.FC = () => {
       <View
     style={{
       width: '100%',
-      height: 65,
+      height: 75,
       backgroundColor: Colors.PRIMARY_BLUE,
       paddingHorizontal: 15
     }}
   >
-    <View style={{marginTop: 20, flexDirection: 'row',
+    <View style={{marginTop: 30, flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',}}>
     <TouchableOpacity
@@ -151,24 +151,30 @@ const HomeScreen: React.FC = () => {
       
   <View style={{ padding: 16 }}>
     <View style={styles.filterBar}>
-      <View style={styles.filterChips}>
-        <TouchableOpacity style={[styles.chip, filter === 'today' && styles.chipActive]} onPress={() => setFilter('today')}>
-          <Text style={[styles.chipText, filter === 'today' && styles.chipTextActive]}>Today</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.chip, filter === 'week' && styles.chipActive]} onPress={() => setFilter('week')}>
-          <Text style={[styles.chipText, filter === 'week' && styles.chipTextActive]}>This Week</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.chip, filter === 'date' && styles.chipActive]} onPress={() => { setFilter('date'); setShowDatePicker(true); }}>
-          <Text style={[styles.chipText, filter === 'date' && styles.chipTextActive]}>Date{filter==='date' ? ` (${selectedDate.toLocaleDateString()})` : ''}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.chip, filter === 'all' && styles.chipActive]} onPress={() => setFilter('all')}>
-          <Text style={[styles.chipText, filter === 'all' && styles.chipTextActive]}>All</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator
+        contentContainerStyle={{ alignItems: 'center', paddingRight: 8 }}
+      >
+        <View style={styles.filterChipsRow}>
+          <TouchableOpacity style={[styles.chip, filter === 'today' && styles.chipActive]} onPress={() => setFilter('today')}>
+            <Text style={[styles.chipText, filter === 'today' && styles.chipTextActive]}>Today</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.chip, filter === 'week' && styles.chipActive]} onPress={() => setFilter('week')}>
+            <Text style={[styles.chipText, filter === 'week' && styles.chipTextActive]}>This Week</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.chip, filter === 'date' && styles.chipActive]} onPress={() => { setFilter('date'); setShowDatePicker(true); }}>
+            <Text style={[styles.chipText, filter === 'date' && styles.chipTextActive]}>Date{filter==='date' ? ` (${selectedDate.toLocaleDateString()})` : ''}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.chip, filter === 'all' && styles.chipActive]} onPress={() => setFilter('all')}>
+            <Text style={[styles.chipText, filter === 'all' && styles.chipTextActive]}>All</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text style={{ marginRight: 8, color: '#444' }}>Show past</Text>
         <Switch value={showPast} onValueChange={setShowPast} />
-      </View>
+      </View> */}
     </View>
 
     <View style={{ marginTop: 8, marginBottom: 6 }}>
@@ -480,6 +486,11 @@ const styles = StyleSheet.create({
   filterChips: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  filterChipsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 0,
   },
   chip: {
     paddingVertical: 6,
