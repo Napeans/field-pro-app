@@ -15,7 +15,6 @@ import { Colors } from '../theme/GlobalStyles';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { BellAlertIcon,ArrowLeftIcon } from "react-native-heroicons/solid";
 const HomeScreen: React.FC = () => {
-  const [checkedIn, setCheckedIn] = useState<boolean>(false);
   const [allocatedJobs, setAllocatedJobs] = useState<Array<{
     id: string;
     title: string;
@@ -23,6 +22,10 @@ const HomeScreen: React.FC = () => {
     time: string;
     date: Date;
     checkedIn: boolean;
+    checkInTime: string | null;
+    checkOutTime: string | null;
+    customerName: string;
+    customerMobile: string;
   }>>(() => {
     const today = new Date();
     const yesterday = new Date(); yesterday.setDate(today.getDate() - 2);
@@ -30,10 +33,10 @@ const HomeScreen: React.FC = () => {
     const lastWeek = new Date(); lastWeek.setDate(today.getDate() - 8);
 
     return [
-      { id: 'J-1001', title: 'Replace AC Filter', address: '123 Main St, Springfield', time: '08:00 AM', date: today, checkedIn: false },
-      { id: 'J-1002', title: 'Inspect Generator', address: '45 Industrial Rd, Shelbyville', time: '10:30 AM', date: yesterday, checkedIn: false },
-      { id: 'J-1003', title: 'Fix Leak', address: '88 River Ave, Ogden', time: '01:00 PM', date: tomorrow, checkedIn: false },
-      { id: 'J-1004', title: 'Roof Inspection', address: '200 Hill St, Springfield', time: '03:00 PM', date: lastWeek, checkedIn: false },
+      { id: 'J-1001', title: 'Replace AC Filter', address: '123 Main St, Springfield', time: '08:00 AM', date: today, checkedIn: false, checkInTime: null, checkOutTime: null, customerName: 'John Smith', customerMobile: '+1-555-0101' },
+      { id: 'J-1002', title: 'Inspect Generator', address: '45 Industrial Rd, Shelbyville', time: '10:30 AM', date: yesterday, checkedIn: false, checkInTime: null, checkOutTime: null, customerName: 'Jane Doe', customerMobile: '+1-555-0102' },
+      { id: 'J-1003', title: 'Fix Leak', address: '88 River Ave, Ogden', time: '01:00 PM', date: tomorrow, checkedIn: false, checkInTime: null, checkOutTime: null, customerName: 'Mike Johnson', customerMobile: '+1-555-0103' },
+      { id: 'J-1004', title: 'Roof Inspection', address: '200 Hill St, Springfield', time: '03:00 PM', date: lastWeek, checkedIn: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
     ];
   });
 
@@ -57,21 +60,18 @@ const HomeScreen: React.FC = () => {
     });
   })();
 
-  const handleCheckIn = () => {
-    setCheckedIn(prev => !prev);
-    Alert.alert('Check-in', !checkedIn ? 'Checked in successfully' : 'Checked out');
-  };
-
-  const handleJobPress = (id: string) => {
-    Alert.alert('Job selected', `Open job ${id}`);
-  };
-
   const handleJobCheckIn = (id: string) => {
     const job = allocatedJobs.find(j => j.id === id);
     if (!job) return;
     const willBeCheckedIn = !job.checkedIn;
-    setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedIn: willBeCheckedIn } : j)));
-    Alert.alert('Job Check-in', willBeCheckedIn ? `Checked in to ${job.id}` : `Checked out of ${job.id}`);
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedIn: willBeCheckedIn, checkInTime: willBeCheckedIn ? now : j.checkInTime, checkOutTime: !willBeCheckedIn ? now : j.checkOutTime } : j)));
+    Alert.alert('Job Check-in', willBeCheckedIn ? `Checked in to ${job.id} at ${now}` : `Checked out of ${job.id} at ${now}`);
+  };
+
+  const handleCallCustomer = (phone: string, name: string) => {
+    const tel = `tel:${phone}`;
+    Linking.openURL(tel).catch(() => Alert.alert('Error', `Unable to make call to ${name}`));
   };
 
   const [notifCount, setNotifCount] = useState<number>(100);
@@ -142,27 +142,54 @@ const HomeScreen: React.FC = () => {
       <Text style={{ fontSize: 14, color: '#444' }}>Showing {filteredJobs.length} of {allocatedJobs.length} jobs</Text>
     </View>
 
-
     <View style={{ marginTop: 12 }}>
       <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 8 }}>Allocated Jobs</Text>
       {filteredJobs.map(job => (
-        <View key={job.id} style={styles.jobItem}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.jobId}>{job.id}</Text>
-            <Text style={styles.jobTitle}>{job.title}</Text>
-            <Text style={styles.jobAddress}>{job.address}</Text>
-            <View style={{ flexDirection: 'row', marginTop: 6, alignItems: 'center' }}>
-              <Text style={styles.jobTime}>{job.time}</Text>
-              <Text style={styles.jobDate}>{(job.date instanceof Date ? job.date : new Date(job.date)).toLocaleDateString()}</Text>
+        <View key={job.id} style={{ marginBottom: 12 }}>
+          {/* Section 1: Job Details with Check-in Button */}
+          <View style={styles.jobSection1}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.jobId}>{job.id}</Text>
+              <Text style={styles.jobTitle}>{job.title}</Text>
+              <Text style={styles.jobAddress}>{job.address}</Text>
+              <View style={{ flexDirection: 'row', marginTop: 6, alignItems: 'center' }}>
+                <Text style={styles.jobTime}>{job.time}</Text>
+                <Text style={styles.jobDate}>{(job.date instanceof Date ? job.date : new Date(job.date)).toLocaleDateString()}</Text>
+              </View>
             </View>
+            <TouchableOpacity
+              style={[styles.jobButton, job.checkedIn ? styles.jobButtonChecked : null]}
+              onPress={() => handleJobCheckIn(job.id)}
+            >
+              <Text style={styles.jobButtonText}>{job.checkedIn ? 'In' : 'Check'}</Text>
+            </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={[styles.jobButton, job.checkedIn ? styles.jobButtonChecked : null]}
-            onPress={() => handleJobCheckIn(job.id)}
-          >
-            <Text style={styles.jobButtonText}>{job.checkedIn ? 'Checked In' : 'Check In'}</Text>
-          </TouchableOpacity>
+          {/* Section 2: Customer Info */}
+          <View style={styles.jobSection2}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.customerName}>{job.customerName}</Text>
+              <Text style={styles.customerMobile}>{job.customerMobile}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.callButton}
+              onPress={() => handleCallCustomer(job.customerMobile, job.customerName)}
+            >
+              <Text style={styles.callButtonText}>📞 Call</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Section 3: Check-in and Check-out Times */}
+          <View style={styles.jobSection3}>
+            <View style={{ flex: 1, alignItems: 'center' }}>
+              <Text style={styles.timeLabel}>Check-in</Text>
+              <Text style={styles.timeValue}>{job.checkInTime || '--:--'}</Text>
+            </View>
+            <View style={{ flex: 1, alignItems: 'center' }}>
+              <Text style={styles.timeLabel}>Check-out</Text>
+              <Text style={styles.timeValue}>{job.checkOutTime || '--:--'}</Text>
+            </View>
+          </View>
         </View>
       ))}
 
@@ -205,25 +232,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
   },
-  card: {
-    backgroundColor: '#FFF',
-    borderRadius: 8,
-    padding: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#111',
-  },
-  statusText: {
-    marginTop: 6,
-    color: '#333',
-  },
   jobItem: {
     backgroundColor: '#FFF',
     borderRadius: 10,
@@ -234,6 +242,33 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  jobSection1: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    padding: 12,
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  jobSection2: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    padding: 12,
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  jobSection3: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    padding: 12,
+    marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -262,6 +297,37 @@ const styles = StyleSheet.create({
     color: '#666',
     marginLeft: 10,
     fontSize: 13,
+  },
+  customerName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111',
+  },
+  customerMobile: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 2,
+  },
+  timeLabel: {
+    fontSize: 11,
+    color: '#999',
+    marginBottom: 2,
+  },
+  timeValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#111',
+  },
+  callButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  callButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 12,
   },
   filterBar: {
     flexDirection: 'row',
