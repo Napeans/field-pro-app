@@ -10,6 +10,10 @@ import {
   Platform,
   Alert,
   Linking,
+  Modal,
+  ScrollView,
+  TextInput,
+  Image,
 } from 'react-native';
 import { Colors } from '../theme/GlobalStyles';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -45,6 +49,14 @@ const HomeScreen: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 
+  // Check-in Form Modal States
+  const [showCheckInModal, setShowCheckInModal] = useState<boolean>(false);
+  const [selectedJobForForm, setSelectedJobForForm] = useState<string | null>(null);
+  const [engineerComments, setEngineerComments] = useState<string>('');
+  const [beforeImage, setBeforeImage] = useState<string | null>(null);
+  const [afterImage, setAfterImage] = useState<string | null>(null);
+  const [customerSignature, setCustomerSignature] = useState<string | null>(null);
+
   const filteredJobs = (() => {
     const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
     const endOfToday = new Date(startOfToday); endOfToday.setHours(23,59,59,999);
@@ -61,13 +73,33 @@ const HomeScreen: React.FC = () => {
   })();
 
   const handleJobCheckIn = (id: string) => {
-    const job = allocatedJobs.find(j => j.id === id);
+    setSelectedJobForForm(id);
+    setEngineerComments('');
+    setBeforeImage(null);
+    setAfterImage(null);
+    setCustomerSignature(null);
+    setShowCheckInModal(true);
+  };
+
+  const handleCheckInFormSubmit = () => {
+    if (!selectedJobForForm) return;
+    
+    if (!engineerComments.trim()) {
+      Alert.alert('Error', 'Please enter engineer comments');
+      return;
+    }
+
+    const job = allocatedJobs.find(j => j.id === selectedJobForForm);
     if (!job) return;
-    const willBeCheckedIn = !job.checkedIn;
+
     const now = new Date();
     const dateTimeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setAllocatedJobs(prev => prev.map(j => (j.id === id ? { ...j, checkedIn: willBeCheckedIn, checkInTime: willBeCheckedIn ? dateTimeStr : j.checkInTime, checkOutTime: !willBeCheckedIn ? dateTimeStr : j.checkOutTime } : j)));
-    Alert.alert('Job Check-in', willBeCheckedIn ? `Checked in to ${job.id} at ${dateTimeStr}` : `Checked out of ${job.id} at ${dateTimeStr}`);
+    
+    setAllocatedJobs(prev => prev.map(j => (j.id === selectedJobForForm ? { ...j, checkedIn: true, checkInTime: dateTimeStr } : j)));
+    
+    Alert.alert('Success', `Checked in to ${job.id} at ${dateTimeStr}\n\nEngineer Comments: ${engineerComments}`);
+    
+    setShowCheckInModal(false);
   };
 
   const handleCallCustomer = (phone: string, name: string) => {
@@ -211,6 +243,101 @@ const HomeScreen: React.FC = () => {
           }}
         />
       )}
+
+      {/* Check-in Form Modal */}
+      <Modal
+        visible={showCheckInModal}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setShowCheckInModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowCheckInModal(false)}>
+              <Text style={styles.modalCloseButton}>✕</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Check-in Form</Text>
+            <View style={{ width: 30 }} />
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            {/* Engineer Comments */}
+            <View style={styles.formSection}>
+              <Text style={styles.formLabel}>Engineer Comments</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter your comments here..."
+                placeholderTextColor="#999"
+                multiline
+                numberOfLines={4}
+                value={engineerComments}
+                onChangeText={setEngineerComments}
+              />
+            </View>
+
+            {/* Before Image */}
+            <View style={styles.formSection}>
+              <Text style={styles.formLabel}>Before Image</Text>
+              <TouchableOpacity
+                style={styles.imageButton}
+                onPress={() => {
+                  Alert.alert('Image Picker', 'Camera or Gallery functionality will be implemented');
+                  setBeforeImage('before-image-placeholder');
+                }}
+              >
+                <Text style={styles.imageButtonText}>📷 Capture / Upload Before Image</Text>
+              </TouchableOpacity>
+              {beforeImage && (
+                <Text style={styles.imageStatus}>✓ Before image added</Text>
+              )}
+            </View>
+
+            {/* After Image */}
+            <View style={styles.formSection}>
+              <Text style={styles.formLabel}>After Image</Text>
+              <TouchableOpacity
+                style={styles.imageButton}
+                onPress={() => {
+                  Alert.alert('Image Picker', 'Camera or Gallery functionality will be implemented');
+                  setAfterImage('after-image-placeholder');
+                }}
+              >
+                <Text style={styles.imageButtonText}>📷 Capture / Upload After Image</Text>
+              </TouchableOpacity>
+              {afterImage && (
+                <Text style={styles.imageStatus}>✓ After image added</Text>
+              )}
+            </View>
+
+            {/* Customer Signature */}
+            <View style={styles.formSection}>
+              <Text style={styles.formLabel}>Customer Signature</Text>
+              <TouchableOpacity
+                style={styles.signatureButton}
+                onPress={() => {
+                  Alert.alert('Signature Pad', 'Signature capture functionality will be implemented');
+                  setCustomerSignature('signature-placeholder');
+                }}
+              >
+                <Text style={styles.signatureButtonText}>✍️ Capture Signature</Text>
+              </TouchableOpacity>
+              {customerSignature && (
+                <Text style={styles.imageStatus}>✓ Signature captured</Text>
+              )}
+            </View>
+
+            {/* Submit Button */}
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleCheckInFormSubmit}
+            >
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
+
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   </View>
 
@@ -387,5 +514,102 @@ const styles = StyleSheet.create({
   jobButtonText: {
     color: '#fff',
     fontWeight: '700',
+  },
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: Colors.PRIMARY_BLUE,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  modalCloseButton: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalContent: {
+    flex: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+  },
+  formSection: {
+    marginBottom: 20,
+  },
+  formLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111',
+    marginBottom: 8,
+  },
+  textInput: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#111',
+    textAlignVertical: 'top',
+  },
+  imageButton: {
+    backgroundColor: '#e3f2fd',
+    borderWidth: 1,
+    borderColor: Colors.PRIMARY_BLUE,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+  },
+  imageButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.PRIMARY_BLUE,
+  },
+  signatureButton: {
+    backgroundColor: '#f3e5f5',
+    borderWidth: 1,
+    borderColor: '#9c27b0',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    minHeight: 100,
+    justifyContent: 'center',
+  },
+  signatureButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#9c27b0',
+  },
+  imageStatus: {
+    fontSize: 12,
+    color: '#4CAF50',
+    marginTop: 8,
+    fontWeight: '500',
+  },
+  submitButton: {
+    backgroundColor: Colors.PRIMARY_BLUE,
+    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  submitButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
   },
 });
