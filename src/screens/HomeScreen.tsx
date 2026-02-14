@@ -45,6 +45,13 @@ const HomeScreen: React.FC = () => {
       { id: 'J-1002', title: 'Inspect Generator', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '10:30 AM', date: yesterday, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Jane Doe', customerMobile: '+1-555-0102' },
       { id: 'J-1003', title: 'Fix Leak', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '01:00 PM', date: tomorrow, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Mike Johnson', customerMobile: '+1-555-0103' },
       { id: 'J-1004', title: 'Roof Inspection', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '03:00 PM', date: lastWeek, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
+      { id: 'J-1005', title: 'Roof Inspection', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '03:00 PM', date: lastWeek, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
+      { id: 'J-1006', title: 'Roof Inspection', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '03:00 PM', date: lastWeek, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
+      { id: 'J-1007', title: 'Roof Inspection', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '03:00 PM', date: lastWeek, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
+      { id: 'J-1008', title: 'Roof Inspection', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '03:00 PM', date: lastWeek, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
+      { id: 'J-1009', title: 'Roof Inspection', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '03:00 PM', date: lastWeek, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
+      { id: 'J-1010', title: 'Roof Inspection', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '03:00 PM', date: lastWeek, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
+      { id: 'J-1011', title: 'Roof Inspection', address: 'SBI life insurance, NGGO Colony MainRoad, Nggo Colony, Erode, Tamil Nadu,India', time: '03:00 PM', date: lastWeek, checkedIn: false, checkedOut: false, checkInTime: null, checkOutTime: null, customerName: 'Sarah Williams', customerMobile: '+1-555-0104' },
     ];
   });
 
@@ -127,7 +134,7 @@ const HomeScreen: React.FC = () => {
   const [notifCount, setNotifCount] = useState<number>(100);
 
   return (
-    <View style={[{ backgroundColor: 'white' }]}>
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
       <View
         style={{
           width: '100%',
@@ -168,7 +175,7 @@ const HomeScreen: React.FC = () => {
         </View>
       </View>
 
-      <View style={{ padding: 16 }}>
+      <View style={{ flex: 1, padding: 16,marginBottom:100 }}>
         <View style={styles.filterBar}>
           <ScrollView
             horizontal
