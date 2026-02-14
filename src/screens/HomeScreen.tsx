@@ -20,14 +20,14 @@ const HomeScreen: React.FC = () => {
       <View
     style={{
       width: '100%',
-      height: 60,
+      height: 65,
       backgroundColor: Colors.PRIMARY_BLUE,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 15,
+      paddingHorizontal: 15
     }}
   >
+    <View style={{marginTop: 20, flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',}}>
     <TouchableOpacity
       style={{ width: 44, height: '100%', justifyContent: 'center', alignItems: 'flex-start' }}
       activeOpacity={0.7}
@@ -36,7 +36,7 @@ const HomeScreen: React.FC = () => {
     </TouchableOpacity>
 
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      {/* center title / spacer */}
+      <Text style={{ color: 'white', fontSize: 18, fontWeight: '600' }}>Home</Text>
     </View>
 
     <TouchableOpacity
@@ -45,6 +45,7 @@ const HomeScreen: React.FC = () => {
     >
       <BellAlertIcon size={28} color="white" />
     </TouchableOpacity>
+    </View>
   </View>
 
       
