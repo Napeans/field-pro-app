@@ -24,7 +24,6 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
   const handleOK = async () => {
     console.log('handleOK called');
     try {
-      // Try to get signature from ref using available methods
       let signature = null;
       const ref = signatureCanvasRef.current;
       
@@ -33,43 +32,72 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureCapture, onCance
         return;
       }
       
-      // First try: use readSignature if available
-      if (typeof ref.readSignature === 'function') {
-        console.log('Trying readSignature...');
-        try {
-          signature = await ref.readSignature();
-          console.log('readSignature successful, length:', signature?.length);
-        } catch (e) {
-          console.log('readSignature failed:', e);
-        }
-      }
+      // Wait longer to ensure canvas methods are initialized
+      await new Promise(resolve => setTimeout(() => resolve(null), 500));
       
-      // Second try: signatureToImageUrl if available
-      if (!signature && typeof ref.signatureToImageUrl === 'function') {
-        console.log('Trying signatureToImageUrl...');
-        try {
-          signature = await ref.signatureToImageUrl();
-          console.log('signatureToImageUrl successful, length:', signature?.length);
-        } catch (e) {
-          console.log('signatureToImageUrl failed:', e);
-        }
-      }
-      
-      // Third try: encodedSignature if available
-      if (!signature && typeof ref.encodedSignature === 'function') {
-        console.log('Trying encodedSignature...');
-        try {
-          signature = await ref.encodedSignature();
-          console.log('encodedSignature successful, length:', signature?.length);
-        } catch (e) {
-          console.log('encodedSignature failed:', e);
-        }
-      }
-      
-      // Fourth try: use currentSignature if onOK callback populated it
-      if (!signature && currentSignature) {
-        console.log('Using currentSignature from callback, length:', currentSignature.length);
+      // Check if currentSignature was already captured by onOK callback (most reliable)
+      if (currentSignature) {
+        console.log('Using currentSignature from onOK callback, length:', currentSignature.length);
         signature = currentSignature;
+      }
+      
+      // If still no signature, try canvas methods with retry logic
+      let retries = 0;
+      const maxRetries = 3;
+      
+      while (!signature && retries < maxRetries) {
+        console.log(`Retry attempt ${retries + 1}/${maxRetries}`);
+        
+        // Try: signatureToImageUrl if available
+        if (typeof ref.signatureToImageUrl === 'function') {
+          console.log('Trying signatureToImageUrl...');
+          try {
+            signature = await ref.signatureToImageUrl();
+            if (signature) {
+              console.log('signatureToImageUrl successful, length:', signature.length);
+              break;
+            }
+          } catch (e) {
+            console.log('signatureToImageUrl failed:', e);
+          }
+        }
+        
+        // Try: encodedSignature if available
+        if (!signature && typeof ref.encodedSignature === 'function') {
+          console.log('Trying encodedSignature...');
+          try {
+            signature = await ref.encodedSignature();
+            if (signature) {
+              console.log('encodedSignature successful, length:', signature.length);
+              break;
+            }
+          } catch (e) {
+            console.log('encodedSignature failed:', e);
+          }
+        }
+        
+        // Try: readSignature if available
+        if (!signature && typeof ref.readSignature === 'function') {
+          console.log('Trying readSignature...');
+          try {
+            signature = await ref.readSignature();
+            if (signature) {
+              console.log('readSignature successful, length:', signature.length);
+              break;
+            }
+          } catch (e) {
+            console.log('readSignature failed:', e);
+          }
+        }
+        
+        // If no signature yet, wait and retry
+        if (!signature) {
+          retries++;
+          if (retries < maxRetries) {
+            console.log('Waiting before retry...');
+            await new Promise(resolve => setTimeout(() => resolve(null), 200));
+          }
+        }
       }
       
       if (signature) {
