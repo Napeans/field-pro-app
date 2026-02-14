@@ -43,32 +43,26 @@ const BottomTabs: React.FC<Props> = ({ onLogOut }) => {
 
   return (
     <>
-     <Tab.Navigator
-  screenOptions={({ route }) => ({
-    headerShown: false,
-    tabBarActiveTintColor: '#04A554',
-    tabBarInactiveTintColor: '#999',
-    tabBarLabelStyle: {
-      fontSize: 16,
-      fontWeight: 'bold',
-    },
-      tabBarStyle: {
-      paddingTop: 8,
-      paddingBottom: 10,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-    },
-    tabBarIcon: ({ color, focused }) => {
-      if (route.name === 'Home') {
-        return <HomeIcon color={color} size={28} />;
-      }
-      if (route.name === 'More') {
-        return <CandyGridIcon color={color} size={28} />;
-      }
-      return null;
-    },
-  })}
->
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarActiveTintColor: '#04A554',
+          tabBarInactiveTintColor: '#999',
+          tabBarStyle: {
+            paddingLeft: 40,
+            paddingRight: 40,
+          },
+          tabBarIcon: ({ color, focused }) => {
+            if (route.name === 'Home') {
+              return <HomeIcon color={color} size={28} />;
+            }
+            if (route.name === 'More') {
+              return <CandyGridIcon color={color} size={28} />;
+            }
+            return null;
+          },
+        })}
+      >
         {/* Visible Tab */}
         <Tab.Screen name="Home" component={HomeScreen} />
 

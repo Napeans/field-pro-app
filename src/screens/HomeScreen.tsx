@@ -4,92 +4,50 @@ import {
   Text,
   StyleSheet,
   Button,
+  TouchableOpacity,
   PermissionsAndroid,
   Platform,
   Alert,
   Linking,
 } from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
-
+import { Colors } from '../theme/GlobalStyles';
+import { BellAlertIcon,ArrowLeftIcon } from "react-native-heroicons/solid";
 const HomeScreen: React.FC = () => {
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
-
-  // 🔹 Request Permission
-  const requestLocationPermission = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: 'Location Permission',
-            message: 'App needs access to your location',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          }
-        );
-
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          return true;
-        }
-
-        if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-          Alert.alert(
-            'Permission Required',
-            'Location permission was permanently denied. Please enable it from settings.',
-            [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Open Settings', onPress: () => Linking.openSettings() },
-            ]
-          );
-        }
-
-        return false;
-      } catch (err) {
-        console.warn(err);
-        return false;
-      }
-    }
-    return true;
-  };
-
-  // 🔹 Get Location
-  const handleLocationPress = async () => {
-    const hasPermission = await requestLocationPermission();
-    if (!hasPermission) return;
-
-    Geolocation.getCurrentPosition(
-      (position) => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-      },
-      (error) => {
-        Alert.alert('Error', error.message);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        forceRequestLocation: true,
-        showLocationDialog: true,
-      }
-    );
-  };
+ 
 
   return (
-      <View style={[styles.container,{backgroundColor:'white'}]}>
-      <Button title="Get Location" onPress={handleLocationPress} />
+      <View style={[{backgroundColor:'white'}]}>
+      <View
+    style={{
+      width: '100%',
+      height: 60,
+      backgroundColor: Colors.PRIMARY_BLUE,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 15,
+    }}
+  >
+    <TouchableOpacity
+      style={{ width: 44, height: '100%', justifyContent: 'center', alignItems: 'flex-start' }}
+      activeOpacity={0.7}
+    >
+      <ArrowLeftIcon size={28} color="white" />
+    </TouchableOpacity>
 
-      <Text style={styles.text}>🏠 Home</Text>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      {/* center title / spacer */}
+    </View>
 
-      <Text style={styles.locationText}>
-        Latitude: {latitude ?? 'Not Available'}
-      </Text>
+    <TouchableOpacity
+      style={{ width: 44, height: '100%', justifyContent: 'center', alignItems: 'flex-end' }}
+      activeOpacity={0.7}
+    >
+      <BellAlertIcon size={28} color="white" />
+    </TouchableOpacity>
+  </View>
 
-      <Text style={styles.locationText}>
-        Longitude: {longitude ?? 'Not Available'}
-      </Text>
+      
     </View>
   );
 };
