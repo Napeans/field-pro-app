@@ -48,8 +48,8 @@ const HomeScreen: React.FC = () => {
     ];
   });
 
-  const [filter, setFilter] = useState<'today' | 'week' | 'all' | 'date'>('today');
-  const [showPast, setShowPast] = useState<boolean>(false);
+  const [filter, setFilter] = useState<'today' | 'week' | 'all' | 'date'>('all');
+  const [showPast, setShowPast] = useState<boolean>(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 
